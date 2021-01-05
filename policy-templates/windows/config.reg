@@ -12,7 +12,7 @@ Windows Registry Editor Version 5.00
 "phishcatch_server"="https://phishcatch.mydomain.com"
 "psk"="MYPSK123"
 "registration_expiry"=dword:0000005a
-"repo_link"="https://github.palantir.build/infosec/phishcatch"
+"repo_link"="https://github.com/palantir/phishcatch"
 "url_sanitization_level"="host"
 
 [HKEY_CURRENT_USER\SOFTWARE\Policies\Google\Chrome\3rdparty\extensions\jgegnlkclgfifjphjmijnkmicfgckmah\policy\domains]
