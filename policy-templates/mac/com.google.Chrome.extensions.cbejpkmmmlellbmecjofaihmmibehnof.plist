@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>display_reuse_alerts</key>
+	<true/>
+  <key>domains</key>
+	<array>
+		<string>mydomain.com</string>
+    		<string>subdomain.mydomain.com</string>
+	</array>
+  <key>phishcatch_server</key>
+  <string>https://phishcatch.mydomain.com</string>
+  <key>psk</key>
+  <string>MYPSK123</string>
+  <key>registration_expiry</key>
+  <integer>90</integer>
+</dict>
+</plist>
