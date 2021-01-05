@@ -21,12 +21,12 @@ The extension uses [Chrome management schema](https://developer.chrome.com/apps/
 - **display_reuse_alerts**: Display pop-up alerts on the endpoint when reuse is detected. The default setting is `true`.
 - **registration_expiry**: The number of days that hashed passwords are cached locally. The default setting is `90`.
 
-Policy templates and further details are available at https://github.com/palantir/phishcatch/policy-templates/
+Policy templates and further details are available at https://github.com/palantir/phishcatch/tree/main/policy-templates
 
 ## Deployment
 The extension can be made mandatory using Chrome's [ExtensionInstallForcelist](https://cloud.google.com/docs/chrome-enterprise/policies/?policy=ExtensionInstallForcelist).
 
-Policy templates and further details are available at https://github.com/palantir/phishcatch/policy-templates/
+Policy templates and further details are available at https://github.com/palantir/phishcatch/tree/main/policy-templates
 
 ## Blind spots for PhishCatch
 - **Bogus passwords**: Each time the user enters a password in a corporate website, a hashed password is stored locally, regardless of whether or not the password is actually a corporate password. If, for example, a user mistakenly enters a personal password on a corporate website, then later enters that personal password in the correct external website, a false positive alert would be generated.
