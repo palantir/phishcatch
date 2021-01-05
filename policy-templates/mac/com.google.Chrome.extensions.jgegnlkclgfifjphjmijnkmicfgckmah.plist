@@ -30,6 +30,8 @@
 	<string>MYPSK123</string>
 	<key>registration_expiry</key>
 	<integer>90</integer>
+	<key>repo_link</key>
+	<string>https://github.com/palantir/phishcatch</string>
 	<key>url_sanitization_level</key>
 	<string>host</string>
 </dict>
