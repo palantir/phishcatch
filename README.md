@@ -19,7 +19,15 @@ The extension uses [Chrome management schema](https://developer.chrome.com/apps/
 
 **Optional configurations:**
 - **display_reuse_alerts**: Display pop-up alerts on the endpoint when reuse is detected. The default setting is `true`.
+- **enable_debug_gui**: Allow debug GUI access. The debug GUI shows the current config, currently cached data (usernames, password hashes, etc.), and allows for manual config override. The default setting is `true`.
+- **enable_manual_password_entry**: Allows the user to manually populate password hashes in the PhishCatch GUI, in addition to capturing them from corporate domains. The default setting is `false`.
+- **extra_annoying_alerts**: Enables endpoint alerts that require user interaction in order to proceed. The default setting is `false`.
+- **faq_link**: Enables a FAQ button in the PhishCatch GUI that links to an arbitrary URL. If not present, no button will be displayed.
+- **ignored_domains**: Configure sites that should be ignored. Usernames and passwords entered into sites on this list will NOT be hashed, stored, compared, or generate alerts. If not present, no domains will be ignored.
+- **pbkdf2_iterations**: The number of PBKDF2 iterations used when hashing passwords. The more iterations used, the more difficult the hash will be to reverse, but will also require additional processing resources on the endpoint. The default setting is `100000`.
 - **registration_expiry**: The number of days that hashed passwords are cached locally. The default setting is `90`.
+- **repo_link**: Enables a "Source Code" button in the PhishCatch GUI that links to an arbitrary URL. If not present, no button will be displayed.
+- **url_sanitization_level**: Determines the verbosity of the URLs sent in reuse alert webhooks. See [policy-templates](https://github.com/palantir/phishcatch/tree/main/policy-templates#url_sanitization_level) for options. The default setting is `host`.
 
 Policy templates and further details are available at https://github.com/palantir/phishcatch/tree/main/policy-templates
 
