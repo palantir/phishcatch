@@ -10,7 +10,7 @@ Windows Registry Editor Version 5.00
 "faq_link"="https://wiki.mydomain.com/PhishCatch"
 "pbkdf2_iterations"=dword:000186a0
 "phishcatch_server"="https://phishcatch.mydomain.com"
-"psk"="keepitsecretkeepitsafe"
+"psk"="MYPSK123"
 "registration_expiry"=dword:0000005a
 "repo_link"="https://github.palantir.build/infosec/phishcatch"
 "url_sanitization_level"="host"
