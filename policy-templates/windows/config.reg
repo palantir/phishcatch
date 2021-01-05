@@ -3,11 +3,22 @@ Windows Registry Editor Version 5.00
 [HKEY_CURRENT_USER\SOFTWARE\Policies\Google\Chrome\3rdparty\extensions\jgegnlkclgfifjphjmijnkmicfgckmah]
 
 [HKEY_CURRENT_USER\SOFTWARE\Policies\Google\Chrome\3rdparty\extensions\jgegnlkclgfifjphjmijnkmicfgckmah\policy]
-"phishcatch_server"="https://phishcatch.mydomain.com"
 "display_reuse_alerts"=dword:00000001
+"enable_debug_gui"=dword:00000001
+"enable_manual_password_entry"=dword:00000000
+"extra_annoying_alerts"=dword:00000000
+"faq_link"="https://wiki.mydomain.com/PhishCatch"
+"pbkdf2_iterations"=dword:000186a0
+"phishcatch_server"="https://phishcatch.mydomain.com"
+"psk"="keepitsecretkeepitsafe"
 "registration_expiry"=dword:0000005a
+"repo_link"="https://github.palantir.build/infosec/phishcatch"
+"url_sanitization_level"="host"
 
 [HKEY_CURRENT_USER\SOFTWARE\Policies\Google\Chrome\3rdparty\extensions\jgegnlkclgfifjphjmijnkmicfgckmah\policy\domains]
-"1"="subdomain.mydomain.com"
-"0"="mydomain.com"
+"00"="mydomain.com"
+"01"="subdomain.mydomain.com"
 
+[HKEY_CURRENT_USER\SOFTWARE\Policies\Google\Chrome\3rdparty\extensions\jgegnlkclgfifjphjmijnkmicfgckmah\policy\ignored_domains]
+"00"="ignored.mydomain.com"
+"01"="*.ignoreme.local"
