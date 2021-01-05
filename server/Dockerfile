@@ -1,4 +1,4 @@
-FROM hub.docker.palantir.build/tiangolo/uvicorn-gunicorn-fastapi:python3.7
+FROM tiangolo/uvicorn-gunicorn-fastapi:python3.7
 
 # RUN apt-get update
 # RUN apt-get -y upgrade
