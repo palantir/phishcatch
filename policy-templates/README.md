@@ -147,6 +147,115 @@ SOFTWARE\Policies\Google\Chrome\3rdparty\extensions\jgegnlkclgfifjphjmijnkmicfgc
 </dict>
 ```
 
+### enable_debug_gui
+
+Enable or disable access to the debug GUI on the endpoint. The debug GUI shows the current config, currently cached data (usernames, password hashes, etc.), and allows for manual config override. The default setting is `true`.
+
+#### Windows (GPO)
+```
+SOFTWARE\Policies\Google\Chrome\3rdparty\extensions\jgegnlkclgfifjphjmijnkmicfgckmah\policy\enable_debug_gui (REG_DWORD) = 0x1 | 0x0
+```
+
+#### macOS
+```
+<dict>
+  <key>enable_debug_gui</key>
+  <true/> | <false/>
+</dict>
+```
+
+### enable_manual_password_entry
+
+Allows the user to manually populate password hashes in the PhishCatch GUI, in addition to capturing them from corporate domains. The default setting is `false`.
+
+#### Windows (GPO)
+```
+SOFTWARE\Policies\Google\Chrome\3rdparty\extensions\jgegnlkclgfifjphjmijnkmicfgckmah\policy\enable_manual_password_entry
+ (REG_DWORD) = 0x1 | 0x0
+```
+
+#### macOS
+```
+<dict>
+  <key>enable_manual_password_entry</key>
+  <true/> | <false/>
+</dict>
+```
+
+### extra_annoying_alerts
+
+Enables endpoint alerts that require user interaction in order to proceed. The default setting is `false`.
+
+#### Windows (GPO)
+```
+SOFTWARE\Policies\Google\Chrome\3rdparty\extensions\jgegnlkclgfifjphjmijnkmicfgckmah\policy\extra_annoying_alerts
+ (REG_DWORD) = 0x1 | 0x0
+```
+
+#### macOS
+```
+<dict>
+  <key>extra_annoying_alerts</key>
+  <true/> | <false/>
+</dict>
+```
+
+### faq_link
+
+Enables a FAQ button in the PhishCatch GUI that links to an arbitrary URL. If not present, no button will be displayed.
+
+#### Windows (GPO)
+```
+SOFTWARE\Policies\Google\Chrome\3rdparty\extensions\jgegnlkclgfifjphjmijnkmicfgckmah\policy\faq_link
+ (REG_SZ) = https://wiki.mydomain.com/PhishCatch
+```
+
+#### macOS
+```
+<dict>
+  <key>faq_link</key>
+  <string>https://wiki.mydomain.com/PhishCatch</string>
+</dict>
+```
+
+### ignored_domains
+
+Configure sites that should be ignored. Usernames and passwords entered into sites on this list will *NOT* be hashed, stored, compared, or generate alerts. If not present, no domains will be ignored.
+
+#### Windows (GPO)
+```
+SOFTWARE\Policies\Google\Chrome\3rdparty\extensions\jgegnlkclgfifjphjmijnkmicfgckmah\policy\ignored_domains\00 (REG_SZ) = ignored.mydomain.com
+SOFTWARE\Policies\Google\Chrome\3rdparty\extensions\jgegnlkclgfifjphjmijnkmicfgckmah\policy\ignored_domains\01 (REG_SZ) = *.ignoreme.local
+```
+
+#### macOS
+```
+<dict>
+  <key>ignored_domains</key>
+  <array>
+    <string>ignored.mydomain.com</string>
+    <string>*.ignoreme.local</string>
+  </array>
+</dict>
+```
+
+### pbkdf2_iterations
+
+The number of PBKDF2 iterations used when hashing passwords. The more iterations used, the more difficult the hash will be to reverse, but will also require additional processing resources on the endpoint. The default setting is `100000`.
+
+#### Windows (GPO)
+```
+SOFTWARE\Policies\Google\Chrome\3rdparty\extensions\jgegnlkclgfifjphjmijnkmicfgckmah\policy\pbkdf2_iterations (REG_DWORD, decimal) = 100000
+```
+
+#### macOS
+```
+<dict>
+  <key>pbkdf2_iterations</key>
+  <integer>100000</integer>
+</dict>
+```
+
 ### registration_expiry
 
 The number of days that hashed passwords are cached locally. The default setting is `90`.
@@ -161,5 +270,46 @@ SOFTWARE\Policies\Google\Chrome\3rdparty\extensions\jgegnlkclgfifjphjmijnkmicfgc
 <dict>
   <key>registration_expiry</key>
   <integer>90</integer>
+</dict>
+```
+
+### repo_link
+
+Enables a "Source Code" button in the PhishCatch GUI that links to an arbitrary URL. If not present, no button will be displayed.
+
+#### Windows (GPO)
+```
+SOFTWARE\Policies\Google\Chrome\3rdparty\extensions\jgegnlkclgfifjphjmijnkmicfgckmah\policy\repo_link
+ (REG_SZ) = https://github.com/palantir/phishcatch
+```
+
+#### macOS
+```
+<dict>
+  <key>repo_link</key>
+  <string>https://github.com/palantir/phishcatch</string>
+</dict>
+```
+
+### url_sanitization_level
+
+Determines the verbosity of the URLs sent in reuse alert webhooks. Options are:
+- `host`: Alerts redact all URL parameters other than the hostname (e.g. `example.com/foo?token=bar` becomes `example.com`)
+- `path`: Alerts include the hostname and path (e.g. `example.com/foo?token=bar` becomes `example.com/foo`)
+- `none`: No sanitization is performed, potentially logging sensitive auth tokens (e.g. `example.com/foo?token=bar` remains `example.com/foo?token=bar`)
+
+The default setting is `host`.
+
+#### Windows (GPO)
+```
+SOFTWARE\Policies\Google\Chrome\3rdparty\extensions\jgegnlkclgfifjphjmijnkmicfgckmah\policy\url_sanitization_level
+ (REG_SZ) = host
+```
+
+#### macOS
+```
+<dict>
+  <key>url_sanitization_level</key>
+  <string>host</string>
 </dict>
 ```
