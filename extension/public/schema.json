@@ -1,0 +1,84 @@
+{
+  "type": "object",
+  "properties": {
+    "display_reuse_alerts": {
+      "description": "Trigger alert pop-up notifications for the user when a password reuse is detected",
+      "type": "boolean",
+      "default": true
+    },
+    "domains": {
+      "description": "Domains where corporate passwords are approved to be entered",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "phishcatch_server": {
+      "description": "URL of the PhishCatch server",
+      "type": "string"
+    },
+    "psk": {
+      "description": "Preshared key as configured on the PhishCatch server",
+      "type": "string"
+    },
+    "registration_expiry": {
+      "description": "Number of days that a hashed password is cached",
+      "type": "integer",
+      "default": 30
+    },
+    "ignored_domains": {
+      "description": "Domains which will be ignored by the extension",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "extra_annoying_alerts": {
+      "description": "Extra annoying user alerts",
+      "type": "boolean",
+      "default": false
+    },
+    "url_sanitization_level": {
+      "description": "Default level of sanitization to perform before reporting url to server",
+      "type": "string",
+      "default": "host"
+    },
+    "pbkdf2_iterations": {
+      "description": "Number of pbkdf2 iterations to perform when hashing passwords. Don't change this unless you know what you're doing",
+      "type": "integer",
+      "default": 100000
+    },
+    "faq_link": {
+      "description": "Link to a FAQ explaining what phishcatch does",
+      "type": "string"
+    },
+    "repo_link": {
+      "description": "Link to the phishcatch source code for enterprising users",
+      "type": "string"
+    },
+    "enable_debug_gui": {
+      "description": "Allow users access to the debug GUI. This is particularly useful in the initial rollout stages to test different configurations.",
+      "type": "boolean",
+      "default": true
+    },
+    "enable_manual_password_entry": {
+      "description": "Enable the manual password entry button",
+      "type": "boolean",
+      "default": false
+    },
+    "username_selectors": {
+      "description": "Custom selectors to find usernames on a login page",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "username_regexes": {
+      "description": "Custom regexes to define the form of usernames so that passwords don't slip in",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}
