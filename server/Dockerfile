@@ -1,7 +1,7 @@
 FROM tiangolo/uvicorn-gunicorn-fastapi:python3.7
 
-# RUN apt-get update
-# RUN apt-get -y upgrade
+RUN apt-get update
+RUN apt-get -y upgrade
 
 COPY ./app /app/app
 
