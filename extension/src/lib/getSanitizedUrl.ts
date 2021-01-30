@@ -1,4 +1,4 @@
-// Copyright 2020 Palantir Technologies
+// Copyright 2021 Palantir Technologies
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,9 +18,9 @@ import { UrlSanitizationEnum } from '../types'
 export async function getSanitizedUrl(url: string) {
   const config = await getConfig()
 
-  const parsedUrl = new URL(url)
-
   try {
+    const parsedUrl = new URL(url)
+
     if (config.url_sanitization_level === UrlSanitizationEnum.none) {
       return url
     } else if (config.url_sanitization_level === UrlSanitizationEnum.path) {

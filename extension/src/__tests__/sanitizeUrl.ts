@@ -1,4 +1,4 @@
-// Copyright 2020 Palantir Technologies
+// Copyright 2021 Palantir Technologies
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -34,6 +34,11 @@ describe('Url path-level sanitization should work', () => {
   it('Urls with no parameters should still work', async () => {
     expect(await getSanitizedUrl(urlNoParams)).toEqual(urlNoParams)
   })
+
+  it('Bad strings should result in blank URLs', async () => {
+    expect(await getSanitizedUrl('.jrwnfk.nsrkj')).toEqual('')
+    expect(await getSanitizedUrl('')).toEqual('')
+  })
 })
 
 describe('Url host-level sanitization should work', () => {
@@ -50,6 +55,11 @@ describe('Url host-level sanitization should work', () => {
   it('Urls with no parameters should still work', async () => {
     expect(await getSanitizedUrl(urlNoParams)).toEqual('https://www.foo.com')
   })
+
+  it('Bad strings should result in blank URLs', async () => {
+    expect(await getSanitizedUrl('.jrwnfk.nsrkj')).toEqual('')
+    expect(await getSanitizedUrl('')).toEqual('')
+  })
 })
 
 describe('Url no sanitization should work', () => {
@@ -65,5 +75,10 @@ describe('Url no sanitization should work', () => {
 
   it('Urls with no parameters should still work', async () => {
     expect(await getSanitizedUrl(urlNoParams)).toEqual(urlNoParams)
+  })
+
+  it('Bad strings should result in blank URLs', async () => {
+    expect(await getSanitizedUrl('.jrwnfk.nsrkj')).toEqual('')
+    expect(await getSanitizedUrl('')).toEqual('')
   })
 })

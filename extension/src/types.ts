@@ -1,4 +1,4 @@
-// Copyright 2020 Palantir Technologies
+// Copyright 2021 Palantir Technologies
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,13 +13,12 @@
 // limitations under the License.
 
 export interface Prefs {
-  domains: string[]
+  enterprise_domains: string[]
   ignored_domains: string[]
   phishcatch_server: string
-  registration_expiry: number
+  data_expiry: number
   display_reuse_alerts: boolean
   psk: string
-  extra_annoying_alerts: boolean
   url_sanitization_level: UrlSanitizationEnum
   pbkdf2_iterations: number
   faq_link: string | null
@@ -46,7 +45,8 @@ export interface PasswordContent {
   save: boolean
   url: string
   referrer: string
-  timestamp: Date
+  timestamp: number
+  username?: string
 }
 
 export enum AlertTypes {
@@ -60,8 +60,10 @@ export enum AlertTypes {
 export interface AlertContent {
   url: string
   referrer: string
-  timestamp: Date
+  timestamp: number
   alertType: AlertTypes
+  associatedUsername?: string
+  associatedHostname?: string
 }
 
 export interface UsernameContent {
@@ -104,13 +106,15 @@ export interface TLSHQuartile {
 
 export interface Username {
   username: string
-  dateAdded: Date
+  dateAdded: number
 }
 
 export interface PasswordHash {
   hash: string
   salt: string
-  dateAdded: Date
+  dateAdded: number
+  username?: string
+  hostname?: string
 }
 
 export enum PasswordHandlingReturnValue {
@@ -129,7 +133,7 @@ export enum DomainType {
 
 export interface DatedDomHash {
   hash: string
-  dateAdded: Date
+  dateAdded: number
   source: string
 }
 

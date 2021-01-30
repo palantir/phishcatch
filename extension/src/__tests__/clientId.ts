@@ -1,4 +1,3 @@
-// Copyright 2021 Palantir Technologies
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,25 +11,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import * as crypto from 'crypto'
-import { getSalt } from '../lib/generateHash'
+import { getId } from '../lib/clientId'
 
 Object.defineProperty(global.self, 'crypto', {
   value: {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     getRandomValues: (arr: any) => crypto.randomBytes(arr.length),
   },
 })
 
-describe('Salt should work', () => {
-  it('Salts should be long', () => {
-    const saltOne = getSalt()
-    expect(saltOne.length).toEqual(32)
-  })
-
-  it('Salts should be different', () => {
-    const saltOne = getSalt()
-    const saltTwo = getSalt()
-    expect(saltOne).not.toEqual(saltTwo)
+describe('Alerts should work', () => {
+  it('Trying to get an ID when none exists should create one', async () => {
+    const id = await getId()
+    expect(typeof id).toEqual('string')
+    expect(id.length).toBeGreaterThan(10)
+    const newId = await getId()
+    expect(newId).toEqual(id)
   })
 })

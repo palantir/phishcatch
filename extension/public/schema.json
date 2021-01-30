@@ -6,7 +6,7 @@
       "type": "boolean",
       "default": true
     },
-    "domains": {
+    "enterprise_domains": {
       "description": "Domains where corporate passwords are approved to be entered",
       "type": "array",
       "items": {
@@ -21,7 +21,7 @@
       "description": "Preshared key as configured on the PhishCatch server",
       "type": "string"
     },
-    "registration_expiry": {
+    "data_expiry": {
       "description": "Number of days that a hashed password is cached",
       "type": "integer",
       "default": 30
@@ -32,11 +32,6 @@
       "items": {
         "type": "string"
       }
-    },
-    "extra_annoying_alerts": {
-      "description": "Extra annoying user alerts",
-      "type": "boolean",
-      "default": false
     },
     "url_sanitization_level": {
       "description": "Default level of sanitization to perform before reporting url to server",

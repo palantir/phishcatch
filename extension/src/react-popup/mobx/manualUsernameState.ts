@@ -1,4 +1,4 @@
-// Copyright 2020 Palantir Technologies
+// Copyright 2021 Palantir Technologies
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ class ManualUsernameState {
 
   setPopupState(newStatus: boolean) {
     this.isOpen = newStatus
-    console.log(this.isOpen)
   }
 
   async hydrateUsername() {

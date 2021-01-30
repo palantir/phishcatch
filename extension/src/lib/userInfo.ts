@@ -1,4 +1,4 @@
-// Copyright 2020 Palantir Technologies
+// Copyright 2021 Palantir Technologies
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -58,14 +58,14 @@ export async function saveUsername(username: string): Promise<boolean> {
 
   const newUserName = {
     username,
-    dateAdded: new Date(),
+    dateAdded: new Date().getTime(),
   }
 
   if (usernameExists) {
     // refresh date on username
     currentUsernames = currentUsernames.map((currentUsername) => {
       if (currentUsername.username === username) {
-        currentUsername.dateAdded = new Date()
+        currentUsername.dateAdded = new Date().getTime()
       }
       return currentUsername
     })
@@ -106,6 +106,16 @@ export async function checkStoredHashes(password: string) {
   return { hashExists: hashIndex > -1, hashIndex, hash: currentHashes[hashIndex] }
 }
 
+export async function getHashDataIfItExists(password: string): Promise<PasswordHash | null> {
+  const hashDetails = await checkStoredHashes(password)
+  if (hashDetails.hashExists) {
+    const currentHashes = await getPasswordHashes()
+    return currentHashes[hashDetails.hashIndex]
+  }
+
+  return null
+}
+
 export async function removeHash(hashToRemove: string) {
   let currentHashes = await getPasswordHashes()
 
@@ -120,15 +130,66 @@ export async function removeHash(hashToRemove: string) {
   })
 }
 
-export async function hashAndSavePassword(password: string) {
+function sanitizeHash(hash: PasswordHash) {
+  if (typeof hash.dateAdded !== 'number') {
+    hash.dateAdded = new Date().getTime()
+  }
+
+  if (!hash.hostname || hash.hostname === 'unknown') {
+    hash.hostname = undefined
+  }
+
+  if (!hash.username || hash.username === 'unknown') {
+    hash.username = undefined
+  }
+
+  return hash
+}
+
+export function checkForExistingAccount(currentHashes: PasswordHash[], username?: string, hostname?: string) {
+  let hashIndex = -1
+  if (!username || !hostname) {
+    return hashIndex
+  }
+
+  currentHashes.forEach((hash, index) => {
+    if (hash.username === username && hash.hostname === hostname) {
+      hashIndex = index
+    }
+  })
+
+  return hashIndex
+}
+
+export async function hashAndSavePassword(password: string, username?: string, hostname?: string) {
+  const currentHashes = (await getPasswordHashes()).map(sanitizeHash)
   const hashDetails = await checkStoredHashes(password)
-  const currentHashes = await getPasswordHashes()
 
   if (hashDetails.hashExists) {
-    currentHashes[hashDetails.hashIndex].dateAdded = new Date()
+    let newUsername = username
+    if (!username || username.length < 1) {
+      newUsername = currentHashes[hashDetails.hashIndex].username
+    }
+
+    currentHashes[hashDetails.hashIndex] = {
+      ...currentHashes[hashDetails.hashIndex],
+      username: newUsername,
+      hostname,
+      dateAdded: new Date().getTime(),
+    }
   } else {
-    const newHash = await generateSaltAndHashPassword(password)
-    currentHashes.push({ ...newHash, dateAdded: new Date() })
+    const existingAccountIndex = checkForExistingAccount(currentHashes, username, hostname)
+    if (existingAccountIndex > -1) {
+      currentHashes[existingAccountIndex] = {
+        ...currentHashes[existingAccountIndex],
+        ...(await generateSaltAndHashPassword(password)),
+        dateAdded: new Date().getTime(),
+      }
+    } else {
+      const newHash = await generateSaltAndHashPassword(password)
+      const newStoredHashObject: PasswordHash = { ...newHash, dateAdded: new Date().getTime(), username, hostname }
+      currentHashes.push(newStoredHashObject)
+    }
   }
 
   return new Promise((resolve) => {

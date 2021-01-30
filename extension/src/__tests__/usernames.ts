@@ -1,4 +1,4 @@
-// Copyright 2020 Palantir Technologies
+// Copyright 2021 Palantir Technologies
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -76,13 +76,12 @@ describe('Usernames should be saved and retrieved correctly', () => {
 
   it('Usernames must match a username regex if one is defined', async () => {
     await setConfigOverride({
-      domains: [],
+      enterprise_domains: [],
       phishcatch_server: '',
       psk: '',
-      registration_expiry: 90,
+      data_expiry: 90,
       display_reuse_alerts: false,
       ignored_domains: [],
-      extraAnnoyingAlerts: false,
       pbkdf2_iterations: 100000,
       // eslint-disable-next-line prettier/prettier
       username_regexes: ['^[a-z0-9](\.?[a-z0-9]){5,}@corporate.com$'],

@@ -1,4 +1,4 @@
-// Copyright 2020 Palantir Technologies
+// Copyright 2021 Palantir Technologies
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { cleanupUsernamesAndPasswords, domHashLimit, passwordHashLimit } from '../lib/timedCleanup'
+import { cleanupUsernamesAndPasswords, dateDiffInDays, domHashLimit, passwordHashLimit } from '../lib/timedCleanup'
 import { getPasswordHashes, getUsernames } from '../lib/userInfo'
 import { setConfigOverride } from '../config'
 import { DatedDomHash, PasswordHash, Username } from '../types'
@@ -24,33 +24,35 @@ afterAll((done) => {
 
 beforeAll(async () => {
   await setConfigOverride({
-    domains: [],
+    enterprise_domains: [],
     phishcatch_server: '',
     psk: '',
-    registration_expiry: 30,
+    data_expiry: 30,
     display_reuse_alerts: true,
     ignored_domains: [],
-    extraAnnoyingAlerts: false,
   })
 })
 
 describe('User data should expire after the configured period of time', () => {
   beforeAll(async () => {
-    const oldDate = new Date()
-    oldDate.setDate(oldDate.getDate() - 31)
+    const yesterday = new Date()
+    yesterday.setDate(yesterday.getDate() - 1)
+
+    const lastMonth = new Date()
+    lastMonth.setDate(lastMonth.getDate() - 31)
     const currentPasswordHashes: PasswordHash[] = [
-      { hash: '00000000', salt: '00000', dateAdded: oldDate },
-      { hash: '11111111', salt: '11111', dateAdded: new Date() },
+      { hash: '00000000', salt: '00000', dateAdded: lastMonth.getTime(), username: '', hostname: '' },
+      { hash: '11111111', salt: '11111', dateAdded: yesterday.getTime(), username: '', hostname: '' },
     ]
 
     const currentDomHashes: DatedDomHash[] = [
-      { hash: '00000000', source: '', dateAdded: oldDate },
-      { hash: '11111111', source: '', dateAdded: new Date() },
+      { hash: '00000000', source: '', dateAdded: lastMonth.getTime() },
+      { hash: '11111111', source: '', dateAdded: yesterday.getTime() },
     ]
 
     const currentUsernames: Username[] = [
-      { username: '00000000', dateAdded: oldDate },
-      { username: '11111111', dateAdded: new Date() },
+      { username: '00000000', dateAdded: lastMonth.getTime() },
+      { username: '11111111', dateAdded: yesterday.getTime() },
     ]
 
     return new Promise((resolve) => {
@@ -61,6 +63,20 @@ describe('User data should expire after the configured period of time', () => {
         },
       )
     })
+  })
+
+  it('Diff in days should work', () => {
+    const yesterday = new Date()
+    yesterday.setDate(yesterday.getDate() - 1)
+
+    const lastMonth = new Date()
+    lastMonth.setDate(lastMonth.getDate() - 31)
+
+    const today = new Date()
+
+    expect(dateDiffInDays(today.getTime(), yesterday.getTime())).toEqual(1)
+    expect(dateDiffInDays(today.getTime(), lastMonth.getTime())).toEqual(31)
+    expect(dateDiffInDays(lastMonth.getTime(), today.getTime())).toEqual(31)
   })
 
   it('Old hashes should be deleted', async () => {
@@ -90,15 +106,23 @@ describe(`For performance reasons we shouldn't store an excessive number of hash
   beforeAll(async () => {
     const oldDate = new Date()
     oldDate.setDate(oldDate.getDate() - 1)
-    const currentPasswordHashes: PasswordHash[] = [{ hash: '11111111', salt: '11111', dateAdded: new Date() }]
+    const currentPasswordHashes: PasswordHash[] = [
+      { hash: '11111111', salt: '11111', dateAdded: new Date().getTime(), username: '', hostname: '' },
+    ]
     for (let i = 0; i < 200; i++) {
-      currentPasswordHashes.push({ hash: '00000000', salt: '00000', dateAdded: oldDate })
+      currentPasswordHashes.push({
+        hash: '00000000',
+        salt: '00000',
+        dateAdded: oldDate.getTime(),
+        username: '',
+        hostname: '',
+      })
     }
 
-    const currentDomHashes: DatedDomHash[] = [{ hash: '11111111', source: '', dateAdded: new Date() }]
+    const currentDomHashes: DatedDomHash[] = [{ hash: '11111111', source: '', dateAdded: new Date().getTime() }]
 
     for (let i = 0; i < 200; i++) {
-      currentDomHashes.push({ hash: '00000000', source: '', dateAdded: oldDate })
+      currentDomHashes.push({ hash: '00000000', source: '', dateAdded: oldDate.getTime() })
     }
 
     return new Promise((resolve) => {

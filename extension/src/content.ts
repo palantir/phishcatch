@@ -1,4 +1,4 @@
-// Copyright 2020 Palantir Technologies
+// Copyright 2021 Palantir Technologies
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,55 +27,69 @@ function ready(callbackFunc: () => void) {
   }
 }
 
-function runHardCodedUsernameScrapers() {
+function runMSUsernameScraper() {
   if (window.location.hostname === 'login.microsoftonline.com') {
     const displayNameNode = document.getElementById('displayName')
-    if (displayNameNode) {
+    if (displayNameNode && displayNameNode.textContent) {
       void saveUsername(displayNameNode.textContent)
+      return displayNameNode.textContent
     }
   }
 }
 
-async function scrapeUsernames() {
+async function scrapeUsernames(): Promise<string | undefined> {
   const config = await getConfig()
 
-  runHardCodedUsernameScrapers()
+  const detectedUsername = runMSUsernameScraper()
+  if (detectedUsername) {
+    return detectedUsername
+  }
 
-  config.username_selectors.forEach((selector) => {
-    const usernameNode = document.querySelector(selector)
-    if (usernameNode.nodeName === 'input') {
-      const usernameFormNode = <HTMLInputElement>usernameNode
-      if (usernameFormNode.value && usernameFormNode.type !== 'password') {
-        void saveUsername(usernameFormNode.value)
+  // return the first detected username for password/username pair purposes
+  // saves all detected usernames as potential user IDs
+  return new Promise((resolve) => {
+    config.username_selectors.forEach((selector) => {
+      const usernameNode = document.querySelector(selector)
+      if (usernameNode && usernameNode.nodeName === 'input') {
+        const usernameFormNode = <HTMLInputElement>usernameNode
+        if (usernameFormNode.value && usernameFormNode.type !== 'password') {
+          void saveUsername(usernameFormNode.value)
+          resolve(usernameFormNode.value)
+        }
+      } else if (usernameNode && usernameNode.textContent) {
+        void saveUsername(usernameNode.textContent)
+        resolve(usernameNode.textContent)
       }
-    } else if (usernameNode.textContent) {
-      void saveUsername(usernameNode.textContent)
-    }
+    })
+
+    resolve(undefined)
   })
 }
 
 // Send the password to the background script to be hashed and compared
 async function checkPassword(password: string, save: boolean) {
+  let username: string | undefined
+  if (save) {
+    username = await scrapeUsernames()
+  }
+
   const content: PasswordContent = {
     password,
+    username,
     save,
     url: await getSanitizedUrl(location.href),
     referrer: await getSanitizedUrl(document.referrer),
-    timestamp: new Date(),
+    timestamp: new Date().getTime(),
   }
   chrome.runtime.sendMessage({
     msgtype: 'password',
     content,
   })
-
-  if (save) {
-    void scrapeUsernames()
-  }
 }
 
 // Send username to the background script to be saved
 async function saveUsername(username: string) {
-  if (typeof username === 'string') {
+  if (typeof username !== 'string') {
     return
   }
 
@@ -102,7 +116,6 @@ function entepriseFormSubmissionTrigger(event: KeyboardEvent) {
 
 function enterpriseFocusOutTrigger(event: FocusEvent) {
   const target = event.target as HTMLInputElement
-
   if (target.nodeName === 'INPUT' && target.type === 'password') {
     void checkPassword(target.value, true)
   }
@@ -132,8 +145,8 @@ ready(() => {
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   setTimeout(async () => {
     if ((await getDomainType(window.location.hostname)) === DomainType.ENTERPRISE) {
-      document.addEventListener('focusout', void enterpriseFocusOutTrigger, false)
-      window.addEventListener('keydown', entepriseFormSubmissionTrigger, true)
+      document.addEventListener('focusout', enterpriseFocusOutTrigger)
+      document.addEventListener('keydown', entepriseFormSubmissionTrigger, true)
       void checkDomHash()
     } else if ((await getDomainType(window.location.hostname)) === DomainType.DANGEROUS) {
       document.addEventListener('input', inputChangedTrigger, false)

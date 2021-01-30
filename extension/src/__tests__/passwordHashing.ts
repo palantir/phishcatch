@@ -1,4 +1,4 @@
-// Copyright 2020 Palantir Technologies
+// Copyright 2021 Palantir Technologies
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,7 +19,9 @@ import { handlePasswordEntry } from '../background'
 import { hashPasswordWithSalt } from '../lib/generateHash'
 import { getPasswordHashes, checkStoredHashes, hashAndSavePassword, removeHash } from '../lib/userInfo'
 import { setConfigOverride } from '../config'
-import { PasswordContent, PasswordHandlingReturnValue } from '../types'
+import { PasswordContent, PasswordHandlingReturnValue, PasswordHash } from '../types'
+import { getHashDataIfItExists, checkForExistingAccount } from '../lib/userInfo'
+import { getHostFromUrl } from '../lib/getHostFromUrl'
 
 Object.defineProperty(global.self, 'crypto', {
   value: {
@@ -40,13 +42,12 @@ const evilUrl = 'http://evil.com/foo'
 
 beforeAll(async () => {
   await setConfigOverride({
-    domains: [enterpriseDomain],
+    enterprise_domains: [enterpriseDomain],
     phishcatch_server: '',
     psk: '',
-    registration_expiry: 90,
+    data_expiry: 90,
     display_reuse_alerts: false,
     ignored_domains: [ignoredDomain],
-    extraAnnoyingAlerts: false,
     pbkdf2_iterations: 100000,
   })
 })
@@ -94,13 +95,12 @@ describe('Password hashing should work', () => {
 
   it('Changing the number of iterations should produce a different result', async () => {
     await setConfigOverride({
-      domains: [enterpriseDomain],
+      enterprise_domains: [enterpriseDomain],
       phishcatch_server: '',
       psk: '',
-      registration_expiry: 90,
+      data_expiry: 90,
       display_reuse_alerts: false,
       ignored_domains: [ignoredDomain],
-      extraAnnoyingAlerts: false,
       pbkdf2_iterations: 100,
     })
 
@@ -113,12 +113,14 @@ describe('Password hashing should work', () => {
 
 describe('Hash saving/checking should work', () => {
   it('Password hash saving should work', async () => {
-    await hashAndSavePassword(passwordOne)
+    await hashAndSavePassword(passwordOne, 'username1', 'hostname.com')
     const hashes = await getPasswordHashes()
     expect(hashes.length).toEqual(1)
-    expect(hashes[0].dateAdded).toBeInstanceOf(Date)
+    expect(typeof hashes[0].dateAdded).toEqual('number')
     expect(typeof hashes[0].salt).toEqual('string')
     expect(hashes[0].salt.length).toBeGreaterThan(10)
+    expect(hashes[0].username).toEqual('username1')
+    expect(hashes[0].hostname).toEqual('hostname.com')
   })
 
   it('We should be able to see if a hash matches a password', async () => {
@@ -138,17 +140,52 @@ describe('Hash saving/checking should work', () => {
     expect(hashes.length).toEqual(1)
   })
 
-  it('Saving the same password should update the associated timestamp', async (callback) => {
+  it('Saving the same password should update the associated metadata', async (callback) => {
     let hashes = await getPasswordHashes()
-    const oldHashTimestamp = hashes[0].dateAdded.getTime()
+    const oldHashTimestamp = hashes[0].dateAdded
 
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     setTimeout(async () => {
-      await hashAndSavePassword(passwordOne)
+      await hashAndSavePassword(passwordOne, 'username2', 'anotherhostname.com')
       hashes = await getPasswordHashes()
-      expect(hashes[0].dateAdded.getTime()).toBeGreaterThan(oldHashTimestamp)
+      expect(hashes[0].dateAdded).toBeGreaterThan(oldHashTimestamp)
+      expect(hashes[0].username).toEqual('username2')
+      expect(hashes[0].hostname).toEqual('anotherhostname.com')
       callback()
-    }, 10)
+    }, 100)
+  })
+
+  it('Checking for an existing account works', async () => {
+    const hashes = await getPasswordHashes()
+    let hashIndex = checkForExistingAccount(hashes, 'username2', 'anotherhostname.com')
+    expect(hashIndex).toEqual(0)
+    hashIndex = checkForExistingAccount(hashes, 'no such user', 'no such hostname')
+    expect(hashIndex).toEqual(-1)
+  })
+
+  it('A new password with the same username and hostname should replace the old one', async () => {
+    let hashes = await getPasswordHashes()
+    expect(hashes.length).toEqual(1)
+    const oldHash = hashes[0]
+
+    await hashAndSavePassword('ejfowefowfjwefnwefjnjknkjrnnewru', 'username2', 'anotherhostname.com')
+    hashes = await getPasswordHashes()
+    expect(hashes.length).toEqual(1)
+    const newHash = hashes[0]
+    expect(oldHash.hash !== newHash.hash)
+    expect(oldHash.dateAdded !== newHash.dateAdded)
+    expect(oldHash.username === newHash.username)
+    expect(oldHash.hostname === newHash.hostname)
+    expect(oldHash.salt === newHash.salt)
+
+    await hashAndSavePassword(passwordOne, 'username2', 'anotherhostname.com')
+    expect(hashes.length).toEqual(1)
+    const newNewHash = hashes[0]
+    expect(oldHash.hash === newNewHash.hash)
+    expect(oldHash.dateAdded !== newNewHash.dateAdded)
+    expect(oldHash.username === newNewHash.username)
+    expect(oldHash.hostname === newNewHash.hostname)
+    expect(oldHash.salt !== newNewHash.salt)
   })
 
   it('A different password should result in a new hash', async () => {
@@ -158,13 +195,23 @@ describe('Hash saving/checking should work', () => {
   })
 
   it('Saving and checking multiple passwords should work', async () => {
-    await hashAndSavePassword('jkfkefejf')
+    await hashAndSavePassword('jkfkefejf', 'eijijefe', 'kejfjef')
     await hashAndSavePassword('passwordTwo')
     await hashAndSavePassword('oejflkwnefk.newfknwekfjnkwenfkjew')
 
     expect((await checkStoredHashes('jkfkefejf')).hashExists).toEqual(true)
     expect((await checkStoredHashes('passwordTwo')).hashExists).toEqual(true)
     expect((await checkStoredHashes('oejflkwnefk.newfknwekfjnkwenfkjew')).hashExists).toEqual(true)
+  })
+
+  it('We should be able to get hash data by passing a password', async () => {
+    const passwordOneData = await getHashDataIfItExists(passwordOne)
+    if (!passwordOneData) throw 'no data'
+    expect(typeof passwordOneData.dateAdded).toEqual('number')
+    expect(typeof passwordOneData.salt).toEqual('string')
+    expect(passwordOneData.salt.length).toBeGreaterThan(10)
+    expect(passwordOneData.username).toEqual('username2')
+    expect(passwordOneData.hostname).toEqual('anotherhostname.com')
   })
 
   it('Saving and checking weird passwords should work', async () => {
@@ -217,11 +264,17 @@ describe('Password message handling works as expected', () => {
       save: true,
       url: enterpriseUrl,
       referrer: "doesn't matter",
-      timestamp: new Date(),
+      timestamp: new Date().getTime(),
+      username: 'exampleUsername',
     }
 
     expect(await handlePasswordEntry(message)).toEqual(PasswordHandlingReturnValue.EnterpriseSave)
     expect((await checkStoredHashes(passwordToBeSaved)).hashExists).toEqual(true)
+
+    const passwordOneData = await getHashDataIfItExists(passwordToBeSaved)
+    if (!passwordOneData) throw 'no data'
+    expect(passwordOneData.username).toEqual('exampleUsername')
+    expect(passwordOneData.hostname).toEqual(getHostFromUrl(enterpriseUrl))
   })
 
   it('Not saving enterprise passwords should work', async () => {
@@ -230,7 +283,8 @@ describe('Password message handling works as expected', () => {
       save: false,
       url: enterpriseUrl,
       referrer: "doesn't matter",
-      timestamp: new Date(),
+      timestamp: new Date().getTime(),
+      username: 'whocares',
     }
 
     expect(await handlePasswordEntry(message)).toEqual(PasswordHandlingReturnValue.EnterpriseNoSave)
@@ -243,7 +297,8 @@ describe('Password message handling works as expected', () => {
       save: false,
       url: evilUrl,
       referrer: 'doesntmatter.com',
-      timestamp: new Date(),
+      timestamp: new Date().getTime(),
+      username: 'exampleUsername',
     }
 
     expect((await checkStoredHashes(passwordToBeSaved)).hashExists).toEqual(true)
@@ -256,7 +311,8 @@ describe('Password message handling works as expected', () => {
       save: false,
       url: ignoredUrl,
       referrer: 'doesntmatter.com',
-      timestamp: new Date(),
+      timestamp: new Date().getTime(),
+      username: 'exampleUsername',
     }
 
     expect(await handlePasswordEntry(message)).toEqual(PasswordHandlingReturnValue.IgnoredDomain)
@@ -268,7 +324,8 @@ describe('Password message handling works as expected', () => {
       save: false,
       url: evilUrl,
       referrer: 'doesntmatter.com',
-      timestamp: new Date(),
+      timestamp: new Date().getTime(),
+      username: 'exampleUsername',
     }
 
     expect(await handlePasswordEntry(message)).toEqual(PasswordHandlingReturnValue.NoReuse)

@@ -1,4 +1,4 @@
-// Copyright 2020 Palantir Technologies
+// Copyright 2021 Palantir Technologies
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,10 +14,14 @@
 
 import * as pbkdf2 from 'pbkdf2'
 import { getConfig } from '../config'
-import { PasswordHash } from '../types'
 import { byteToHex } from './byteToHex'
 
-export async function hashPasswordWithSalt(key: string, salt: string): Promise<PasswordHash> {
+export interface ContextlessPasswordHash {
+  hash: string
+  salt: string
+}
+
+export async function hashPasswordWithSalt(key: string, salt: string): Promise<ContextlessPasswordHash> {
   const config = await getConfig()
 
   const iterations = config.pbkdf2_iterations
@@ -38,7 +42,6 @@ export async function hashPasswordWithSalt(key: string, salt: string): Promise<P
         const passwordHash = {
           hash,
           salt,
-          dateAdded: new Date(),
         }
         resolve(passwordHash)
       }
@@ -46,7 +49,7 @@ export async function hashPasswordWithSalt(key: string, salt: string): Promise<P
   })
 }
 
-export async function generateSaltAndHashPassword(key: string): Promise<PasswordHash> {
+export async function generateSaltAndHashPassword(key: string): Promise<ContextlessPasswordHash> {
   const salt = getSalt()
   return hashPasswordWithSalt(key, salt)
 }

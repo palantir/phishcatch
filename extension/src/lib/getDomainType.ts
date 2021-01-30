@@ -1,4 +1,4 @@
-// Copyright 2020 Palantir Technologies
+// Copyright 2021 Palantir Technologies
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -53,7 +53,7 @@ async function isIgnoredDomain(host: string): Promise<boolean> {
 
 async function isEnterpriseDomain(host: string): Promise<boolean> {
   const config = await getConfig()
-  return hostMatches(host, config.domains)
+  return hostMatches(host, config.enterprise_domains)
 }
 
 export async function getDomainType(host: string) {
