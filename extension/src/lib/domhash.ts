@@ -1,4 +1,4 @@
-// Copyright 2020 Palantir Technologies
+// Copyright 2021 Palantir Technologies
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ export async function alertUser(host: string) {
   const config = await getConfig()
 
   void createServerAlert({
-    timestamp: new Date(),
+    timestamp: new Date().getTime(),
     alertType: AlertTypes.DOMHASH,
     referrer: '',
     url: host,
@@ -54,10 +54,6 @@ export async function alertUser(host: string) {
     }
 
     chrome.notifications.create(opt)
-
-    if (config.extra_annoying_alerts) {
-      alert("This looks like a phishing page! Be careful. Ask infosec if you're not sure what to do.")
-    }
   }
 }
 
@@ -86,6 +82,7 @@ export async function saveDOMHash(dom: string, url: string) {
   }
 
   const savedDatedHashes = await getSavedDomHashes()
+
   const currentHashes = savedDatedHashes.map((hash) => {
     return loadTlshInstanceFromHash(hash.hash)
   })
@@ -99,12 +96,12 @@ export async function saveDOMHash(dom: string, url: string) {
 
   return new Promise((resolve) => {
     if (existingHashIndex !== -1) {
-      savedDatedHashes[existingHashIndex].dateAdded = new Date()
+      savedDatedHashes[existingHashIndex].dateAdded = new Date().getTime()
       resolve(true)
     } else {
-      savedDatedHashes.push({ hash: currentHash, dateAdded: new Date(), source: getHostFromUrl(url) })
+      savedDatedHashes.push({ hash: currentHash, dateAdded: new Date().getTime(), source: getHostFromUrl(url) })
 
-      chrome.storage.local.set({ domTlshHashes: currentHashes }, () => {
+      chrome.storage.local.set({ datedDomHashes: savedDatedHashes }, () => {
         resolve(true)
       })
     }
@@ -115,7 +112,6 @@ export async function getSavedDomHashes(): Promise<DatedDomHash[]> {
   return new Promise((resolve) => {
     chrome.storage.local.get('datedDomHashes', (data: { datedDomHashes: DatedDomHash[] | undefined }) => {
       const hashes: DatedDomHash[] = data.datedDomHashes || []
-
       if (!data.datedDomHashes) {
         chrome.storage.local.set({ datedDomHashes: hashes }, () => {
           resolve(hashes)
@@ -141,13 +137,17 @@ export async function checkDOMHash(dom: string, url: string) {
   }
   const host = getHostFromUrl(url)
 
-  if ((await getDomainType(host)) === DomainType.DANGEROUS) {
+  const domainType = await getDomainType(host)
+
+  if (domainType === DomainType.DANGEROUS) {
     const newInstance: TLSHInstance = getTlshInstance(dom)
     const domHashes = await getHashesAsTlshInstances()
     if (domHashes.some((corporateInstance) => hashesMatch(corporateInstance, newInstance))) {
       await alertUser(url)
       return true
     }
+  } else if (domainType === DomainType.ENTERPRISE) {
+    void saveDOMHash(dom, url)
   }
 
   return false

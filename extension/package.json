@@ -10,7 +10,7 @@
     "test": "npx jest"
   },
   "author": "",
-  "license": "MIT",
+  "license": "APACHE",
   "jest": {
     "setupFiles": [
       "jest-webextension-mock"

@@ -1,4 +1,4 @@
-// Copyright 2020 Palantir Technologies
+// Copyright 2021 Palantir Technologies
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,12 +15,16 @@
 import { getConfig } from '../config'
 import { AlertContent, AlertTypes } from '../types'
 import { getUsernames } from './userInfo'
+import { getId } from './clientId'
 
 interface Alert {
-  username: string
-  url: string
+  allAssociatedUsernames: string
+  alertUrl: string
   psk: string
-  date: Date
+  alertTimestamp: number
+  clientId: string
+  suspectedUsername?: string
+  suspectedHost?: string
   referrer?: string
   alertType: AlertTypes
 }
@@ -43,12 +47,12 @@ export async function getUnsentAlerts(): Promise<UnsentAlert[]> {
 export async function saveUnsentAlert(newUnsentAlert: UnsentAlert) {
   let unsentAlerts = await getUnsentAlerts()
   const isOldAlert = unsentAlerts.some((currentAlert) => {
-    currentAlert.alert.date === newUnsentAlert.alert.date
+    currentAlert.alert.alertTimestamp === newUnsentAlert.alert.alertTimestamp
   })
 
   if (isOldAlert) {
     unsentAlerts = unsentAlerts.map((currentAlert) => {
-      if (currentAlert.alert.date === newUnsentAlert.alert.date) {
+      if (currentAlert.alert.alertTimestamp === newUnsentAlert.alert.alertTimestamp) {
         currentAlert = newUnsentAlert
       }
 
@@ -84,7 +88,6 @@ export async function sendAlert(alert: Alert) {
       return false
     }
   } catch (error) {
-    console.error('Error sending alert')
     return false
   }
 }
@@ -96,18 +99,25 @@ export async function createServerAlert(message: AlertContent) {
     return false
   }
 
+  if (checkIfDup(message)) {
+    return false
+  }
+
   const data: Alert = {
-    referrer: message.referrer,
-    date: message.timestamp,
-    alertType: message.alertType,
-    url: message.url,
-    username: '',
+    alertUrl: message.url,
+    allAssociatedUsernames: '',
     psk: '',
+    referrer: message.referrer,
+    alertTimestamp: message.timestamp,
+    alertType: message.alertType,
+    suspectedUsername: message.associatedUsername,
+    suspectedHost: message.associatedHostname,
+    clientId: await getId(),
   }
 
   const usernames = (await getUsernames()).map((username) => username.username)
 
-  data.username = JSON.stringify(usernames)
+  data.allAssociatedUsernames = JSON.stringify(usernames)
   data.psk = config.psk
 
   const sentAlert = await sendAlert(data)
@@ -118,5 +128,41 @@ export async function createServerAlert(message: AlertContent) {
     })
   }
 
-  return true
+  return data
 }
+
+export function checkIfDup(message: AlertContent) {
+  const thirtySeconds = 30 * 1000
+
+  const dupCheckString = JSON.stringify({
+    url: message.url,
+    alertType: message.alertType,
+    username: message.associatedUsername,
+    hostname: message.associatedHostname,
+  })
+
+  if (recentAlerts.has(dupCheckString)) {
+    const dupDate = recentAlerts.get(dupCheckString)
+    if (!dupDate) {
+      throw 'no date'
+    }
+
+    if (new Date().getTime() - dupDate.getTime() < thirtySeconds) {
+      return true
+    } else {
+      recentAlerts.delete(dupCheckString)
+    }
+  } else {
+    recentAlerts.set(dupCheckString, new Date())
+  }
+
+  return false
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+let recentAlerts: Map<string, Date> = new Map()
+
+setTimeout(() => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  recentAlerts = new Map()
+}, 24 * 60 * 60 * 1000)

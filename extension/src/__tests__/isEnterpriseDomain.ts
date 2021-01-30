@@ -1,4 +1,4 @@
-// Copyright 2020 Palantir Technologies
+// Copyright 2021 Palantir Technologies
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,13 +30,12 @@ const evilSubDomain = 'foo.evil.com'
 
 beforeAll(async () => {
   await setConfigOverride({
-    domains: [enterpriseDomain, wildcardEnterpriseDomain],
+    enterprise_domains: [enterpriseDomain, wildcardEnterpriseDomain],
     phishcatch_server: '',
     psk: '',
-    registration_expiry: 90,
+    data_expiry: 90,
     display_reuse_alerts: true,
     ignored_domains: [ignoredDomain, wildcardIgnoredDomain],
-    extraAnnoyingAlerts: false,
   })
 })
 
@@ -85,16 +84,15 @@ describe('We should be able to identify enterprise and ignored domains', () => {
 
   it('Domains without tlds should work correctly', async () => {
     await setConfigOverride({
-      domains: [enterpriseDomain, wildcardEnterpriseDomain, getHostFromUrl(enterpriseUrlWithoutTLD)],
+      enterprise_domains: [enterpriseDomain, wildcardEnterpriseDomain, getHostFromUrl(enterpriseUrlWithoutTLD)],
       phishcatch_server: '',
       psk: '',
-      registration_expiry: 90,
+      data_expiry: 90,
       display_reuse_alerts: true,
       ignored_domains: [ignoredDomain, wildcardIgnoredDomain],
-      extraAnnoyingAlerts: false,
     })
 
-    expect((await getConfig()).domains.includes('foo-bar-baz'))
+    expect((await getConfig()).enterprise_domains.includes('foo-bar-baz'))
     expect(await getDomainType(getHostFromUrl(enterpriseUrlWithoutTLD))).toBe(DomainType.ENTERPRISE)
   })
 })

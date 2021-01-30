@@ -1,4 +1,4 @@
-// Copyright 2020 Palantir Technologies
+// Copyright 2021 Palantir Technologies
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,7 +20,8 @@ import { popupStore } from './mobx/popupState'
 
 @observer
 export class ConfigOverrideForm extends React.Component {
-  constructor(props: unknown) {
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  constructor(props: {} | Readonly<{}>) {
     super(props)
   }
 

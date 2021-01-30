@@ -1,4 +1,4 @@
-// Copyright 2020 Palantir Technologies
+// Copyright 2021 Palantir Technologies
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,32 +23,43 @@ const dayValue = hourValue * 24
 export const passwordHashLimit = 20
 export const domHashLimit = 50
 
-export function dateDiffInDays(date1: Date, date2: Date) {
-  const diffInMs = date2.getTime() - date1.getTime()
+export function dateDiffInDays(date1: number, date2: number) {
+  const diffInMs = date2 - date1
   const diffInDays = diffInMs / dayValue
   return Math.abs(diffInDays)
 }
 
-async function cleanData(hashes: { dateAdded: Date }[], hashLimit: number) {
+function notEmpty<TValue>(value: TValue | null | undefined): value is TValue {
+  return value !== null && value !== undefined
+}
+
+async function cleanData(hashes: { dateAdded: number }[], hashLimit: number) {
   const config = await getConfig()
-  const currentDate = new Date()
+  const currentDate = new Date().getTime()
 
   return hashes
+    .map((hash) => {
+      if (typeof hash.dateAdded !== 'number') {
+        hash.dateAdded = new Date().getTime()
+      }
+
+      return hash
+    })
     .filter((hash) => {
-      return dateDiffInDays(hash.dateAdded, currentDate) < config.registration_expiry
+      return dateDiffInDays(hash.dateAdded, currentDate) < config.data_expiry
     })
     .sort((hash1, hash2) => {
-      return hash2.dateAdded.getTime() - hash1.dateAdded.getTime()
+      return hash2.dateAdded - hash1.dateAdded
     })
     .slice(0, hashLimit)
 }
 
 export async function cleanupUsernamesAndPasswords() {
-  const currentDate = new Date()
+  const currentDate = new Date().getTime()
   const config = await getConfig()
 
   const usernames = (await getUsernames()).filter((username) => {
-    return dateDiffInDays(username.dateAdded, currentDate) < config.registration_expiry
+    return dateDiffInDays(username.dateAdded, currentDate) < config.data_expiry
   })
 
   const passwordHashes = await cleanData(await getPasswordHashes(), passwordHashLimit)
@@ -56,19 +67,29 @@ export async function cleanupUsernamesAndPasswords() {
   const datedDomHashes = await cleanData(await getSavedDomHashes(), domHashLimit)
 
   return new Promise((resolve) => {
-    chrome.storage.local.set({ usernames, passwordHashes, datedDomHashes }, () => {
-      resolve(true)
-    })
+    chrome.storage.local.set(
+      {
+        usernames,
+        passwordHashes,
+        datedDomHashes,
+      },
+      () => {
+        resolve(true)
+      },
+    )
   })
 }
 
 export async function tryToSendFailedAlerts() {
-  const currentDate = new Date()
+  const currentDate = new Date().getTime()
 
   let unsentAlerts = (await getUnsentAlerts()).filter((unsentAlert) => {
-    return dateDiffInDays(unsentAlert.alert.date, currentDate) < 7
+    const dateDiff = dateDiffInDays(unsentAlert.alert.alertTimestamp, currentDate)
+
+    return dateDiff < 30
   })
 
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   unsentAlerts = (
     await Promise.all(
       unsentAlerts.map(async (unsentAlert) => {
@@ -81,12 +102,17 @@ export async function tryToSendFailedAlerts() {
         }
       }),
     )
-  ).filter((unsentAlert) => !!unsentAlert)
+  ).filter(notEmpty)
 
   chrome.storage.local.set({ unsentAlerts })
+
+  return unsentAlerts
 }
 
 export function timedCleanup() {
+  void tryToSendFailedAlerts()
+  void cleanupUsernamesAndPasswords()
+
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   setInterval(cleanupUsernamesAndPasswords, hourValue)
 

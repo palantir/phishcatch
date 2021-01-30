@@ -1,4 +1,4 @@
-// Copyright 2020 Palantir Technologies
+// Copyright 2021 Palantir Technologies
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ class StorageState {
   async loadConfig() {
     this.config = await getConfig()
     const passwordHashList = (await getPasswordHashes()).map((hash) => {
-      return hash.hash.substring(0, 15) + '...'
+      return JSON.stringify({ ...hash, hash: hash.hash.substring(0, 15) + '...' }, null, 2)
     })
 
     const domHashList: string[] = (await getHashesAsTlshInstances()).map((instance) => {

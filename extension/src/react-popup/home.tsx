@@ -1,4 +1,4 @@
-// Copyright 2020 Palantir Technologies
+// Copyright 2021 Palantir Technologies
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,7 +27,8 @@ export function Home() {
     <div>
       <Card>
         <p>
-          PhishCatch is a browser extension that prevents corporate passwords from being leaked.
+          Phishcatch is a browser extension that prevents corporate passwords from being leaked and sends infosec an
+          alert when they are.
         </p>
       </Card>
 

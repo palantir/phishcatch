@@ -1,4 +1,4 @@
-// Copyright 2020 Palantir Technologies
+// Copyright 2021 Palantir Technologies
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,13 +23,12 @@ interface configCache {
 }
 
 const defaults: Prefs = {
-  domains: [],
+  enterprise_domains: [],
   phishcatch_server: '',
   psk: '',
-  registration_expiry: 30,
+  data_expiry: 30,
   display_reuse_alerts: true,
   ignored_domains: [],
-  extra_annoying_alerts: false,
   url_sanitization_level: UrlSanitizationEnum.host,
   pbkdf2_iterations: 100000,
   faq_link: null,
@@ -113,7 +112,7 @@ export function clearCache() {
 
 export async function getConfig(): Promise<Prefs> {
   if (configCache) {
-    const cacheAgeInMinutes = dateDiffInDays(new Date(), configCache.timestamp)
+    const cacheAgeInMinutes = dateDiffInDays(new Date().getTime(), configCache.timestamp.getTime())
     if (cacheAgeInMinutes < 10) {
       return configCache.config
     } else {

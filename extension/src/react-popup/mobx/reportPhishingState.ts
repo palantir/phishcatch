@@ -1,4 +1,4 @@
-// Copyright 2020 Palantir Technologies
+// Copyright 2021 Palantir Technologies
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ class ReportPhishingState {
         const sentAlert = await createServerAlert({
           url,
           referrer: '',
-          timestamp: new Date(),
+          timestamp: new Date().getTime(),
           alertType: AlertTypes.USERREPORT,
         })
         if (sentAlert) {

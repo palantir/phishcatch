@@ -1,4 +1,4 @@
-// Copyright 2020 Palantir Technologies
+// Copyright 2021 Palantir Technologies
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -46,13 +46,12 @@ const redditDom = fs.readFileSync('./src/__tests__/samples/redditdom.txt').toStr
 
 beforeAll(async () => {
   await setConfigOverride({
-    domains: ['corporate.com'],
+    enterprise_domains: ['corporate.com'],
     phishcatch_server: '',
     psk: '',
-    registration_expiry: 90,
+    data_expiry: 90,
     display_reuse_alerts: true,
     ignored_domains: [ignoredUrl],
-    extraAnnoyingAlerts: false,
   })
 })
 
@@ -127,7 +126,7 @@ describe('Hash saving/checking should work', () => {
   it('Hash metadata should exist', async () => {
     const domHashes = await getSavedDomHashes()
     const datedDomHash = domHashes[0]
-    expect(datedDomHash.dateAdded).toBeInstanceOf(Date)
+    expect(typeof datedDomHash.dateAdded).toEqual('number')
     expect(datedDomHash.source).toEqual(getHostFromUrl(enterpriseUrl))
   })
 
@@ -148,14 +147,14 @@ describe('Hash saving/checking should work', () => {
   it('Saving the same hash should update the timestamp', async (callback) => {
     let domHashes = await getSavedDomHashes()
     const datedDomHash = domHashes[0]
-    const originalDate = datedDomHash.dateAdded.getTime()
+    const originalDate = datedDomHash.dateAdded
 
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     setTimeout(async () => {
       await saveDOMHash(baseText, enterpriseUrl)
       domHashes = await getSavedDomHashes()
 
-      expect(domHashes[0].dateAdded.getTime()).toBeGreaterThan(originalDate)
+      expect(domHashes[0].dateAdded).toBeGreaterThan(originalDate)
       callback()
     }, 10)
   })
