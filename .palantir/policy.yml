@@ -1,0 +1,13 @@
+policy:
+  approval:
+    - infosec has approved changes
+
+approval_rules:
+  - name: infosec has approved changes
+    options:
+      invalidate_on_push: true
+      allow_author: false
+      allow_contributor: false
+    requires:
+      count: 1
+      teams: ["palantir/infosec"]
