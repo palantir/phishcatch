@@ -1,0 +1,46 @@
+{
+  "manifest_version": 2,
+  "name": "PhishCatch",
+  "description": "Identify and prevent enterprise password leaks",
+  "version": "0.13",
+  "icons": {
+    "128": "icon.png"
+  },
+  "storage": {
+    "managed_schema": "schema.json"
+  },
+  "externally_connectable": {},
+  "content_security_policy": "script-src 'self'; object-src 'self'; connect-src https://*",
+  "background": {
+    "scripts": [
+      "js/background.js",
+      "js/vendor.js"
+    ],
+    "persistent": true
+  },
+  "browser_action": {
+    "default_icon": "icon.png",
+    "default_popup": "popup.html",
+    "default_title": "Phishcatch"
+  },
+  "web_accessible_resources": [],
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*/*"
+      ],
+      "all_frames": true,
+      "run_at": "document_idle",
+      "js": [
+        "js/content.js",
+        "js/vendor.js"
+      ]
+    }
+  ],
+  "permissions": [
+    "http://*/*",
+    "https://*/*",
+    "storage",
+    "notifications"
+  ]
+}

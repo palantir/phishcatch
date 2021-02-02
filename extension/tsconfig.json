@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "es6",
+        "noImplicitAny": true,
+        "strictNullChecks": true,
+        "sourceMap": false,
+        "rootDir": "src",
+        "outDir": "dist/js",
+        "noEmitOnError": true,
+        "jsx": "react",
+        "experimentalDecorators": true,
+        "forceConsistentCasingInFileNames": true,
+        "typeRoots": [ "node_modules/@types" ]
+    }
+}
