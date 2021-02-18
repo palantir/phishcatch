@@ -27,6 +27,7 @@ export interface Prefs {
   manual_password_entry: boolean
   username_selectors: string[]
   username_regexes: string[]
+  hash_truncation_amount: number
 }
 
 export enum UrlSanitizationEnum {

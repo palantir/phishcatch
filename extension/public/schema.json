@@ -47,6 +47,10 @@
       "description": "Link to a FAQ explaining what phishcatch does",
       "type": "string"
     },
+    "hash_truncation_amount": {
+      "description": "Number of characters to truncate saved hashes by",
+      "type": "integer"
+    },
     "repo_link": {
       "description": "Link to the phishcatch source code for enterprising users",
       "type": "string"
