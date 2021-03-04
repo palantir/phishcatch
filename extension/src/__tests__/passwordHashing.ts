@@ -50,6 +50,7 @@ describe('Password hashing should work', () => {
       display_reuse_alerts: false,
       ignored_domains: [ignoredDomain],
       pbkdf2_iterations: 100000,
+      expire_hash_on_use: false
     })
 
     const firstHash = await hashPasswordWithSalt(passwordOne, salt)
@@ -323,6 +324,44 @@ describe('Password message handling works as expected', () => {
     }
 
     expect(await handlePasswordEntry(message)).toEqual(PasswordHandlingReturnValue.NoReuse)
+  })
+
+  it('Setting expire_hash_on_use should prevent passwords from alerting twice', async () => {
+    await setConfigOverride({
+      enterprise_domains: [enterpriseDomain],
+      phishcatch_server: '',
+      psk: '',
+      data_expiry: 90,
+      display_reuse_alerts: false,
+      ignored_domains: [ignoredDomain],
+      pbkdf2_iterations: 100000,
+      expire_hash_on_use: true
+    })
+
+
+    let message: PasswordContent = {
+      password: passwordToBeSaved,
+      save: true,
+      url: enterpriseUrl,
+      referrer: 'doesntmatter.com',
+      timestamp: new Date().getTime(),
+      username: 'exampleUsername',
+    }
+
+    expect(await handlePasswordEntry(message)).toEqual(PasswordHandlingReturnValue.EnterpriseSave)
+    expect((await checkStoredHashes(passwordToBeSaved)).hashExists).toEqual(true)
+
+    message = {
+      password: passwordToBeSaved,
+      save: false,
+      url: evilUrl,
+      referrer: 'doesntmatter.com',
+      timestamp: new Date().getTime(),
+      username: 'exampleUsername',
+    }
+
+    expect(await handlePasswordEntry(message)).toEqual(PasswordHandlingReturnValue.ReuseAlert)
+    expect((await checkStoredHashes(passwordToBeSaved)).hashExists).toEqual(false)
   })
 })
 

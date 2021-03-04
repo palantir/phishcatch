@@ -28,6 +28,7 @@ export interface Prefs {
   username_selectors: string[]
   username_regexes: string[]
   hash_truncation_amount: number
+  expire_hash_on_use: boolean
 }
 
 export enum UrlSanitizationEnum {

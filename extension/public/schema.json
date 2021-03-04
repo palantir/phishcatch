@@ -65,6 +65,11 @@
       "type": "boolean",
       "default": false
     },
+    "expire_hash_on_use": {
+      "description": "Remove matching hashes when an alert is triggered. This is useful if the extension can't always detect password resets.",
+      "type": "boolean",
+      "default": true
+    },
     "username_selectors": {
       "description": "Custom selectors to find usernames on a login page",
       "type": "array",

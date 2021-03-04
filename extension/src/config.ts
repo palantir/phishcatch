@@ -37,7 +37,8 @@ const defaults: Prefs = {
   manual_password_entry: false,
   username_selectors: [],
   username_regexes: [],
-  hash_truncation_amount: 0
+  hash_truncation_amount: 0,
+  expire_hash_on_use: true
 }
 
 let configCache: configCache | false = false
