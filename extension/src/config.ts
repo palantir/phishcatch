@@ -23,22 +23,22 @@ interface configCache {
 }
 
 const defaults: Prefs = {
-  enterprise_domains: [],
-  phishcatch_server: '',
-  psk: '',
   data_expiry: 30,
   display_reuse_alerts: true,
-  ignored_domains: [],
-  url_sanitization_level: UrlSanitizationEnum.host,
-  pbkdf2_iterations: 100000,
-  faq_link: null,
-  repo_link: null,
   enable_debug_gui: true,
-  manual_password_entry: false,
-  username_selectors: [],
-  username_regexes: [],
+  enterprise_domains: [],
+  expire_hash_on_use: true,
+  faq_link: null,
   hash_truncation_amount: 0,
-  expire_hash_on_use: true
+  ignored_domains: [],
+  manual_password_entry: false,
+  pbkdf2_iterations: 100000,
+  phishcatch_server: '',
+  psk: '',
+  repo_link: null,
+  url_sanitization_level: UrlSanitizationEnum.host,
+  username_regexes: [],
+  username_selectors: [],
 }
 
 let configCache: configCache | false = false

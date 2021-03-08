@@ -1,88 +1,88 @@
 {
-  "type": "object",
-  "properties": {
-    "display_reuse_alerts": {
-      "description": "Trigger alert pop-up notifications for the user when a password reuse is detected",
-      "type": "boolean",
-      "default": true
-    },
-    "enterprise_domains": {
-      "description": "Domains where corporate passwords are approved to be entered",
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
-    },
-    "phishcatch_server": {
-      "description": "URL of the PhishCatch server",
-      "type": "string"
-    },
-    "psk": {
-      "description": "Preshared key as configured on the PhishCatch server",
-      "type": "string"
-    },
-    "data_expiry": {
-      "description": "Number of days that a hashed password is cached",
-      "type": "integer",
-      "default": 30
-    },
-    "ignored_domains": {
-      "description": "Domains which will be ignored by the extension",
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
-    },
-    "url_sanitization_level": {
-      "description": "Default level of sanitization to perform before reporting url to server",
-      "type": "string",
-      "default": "host"
-    },
-    "pbkdf2_iterations": {
-      "description": "Number of pbkdf2 iterations to perform when hashing passwords. Don't change this unless you know what you're doing",
-      "type": "integer",
-      "default": 100000
-    },
-    "faq_link": {
-      "description": "Link to a FAQ explaining what phishcatch does",
-      "type": "string"
-    },
-    "hash_truncation_amount": {
-      "description": "Number of characters to truncate saved hashes by",
-      "type": "integer"
-    },
-    "repo_link": {
-      "description": "Link to the phishcatch source code for enterprising users",
-      "type": "string"
-    },
-    "enable_debug_gui": {
-      "description": "Allow users access to the debug GUI. This is particularly useful in the initial rollout stages to test different configurations.",
-      "type": "boolean",
-      "default": true
-    },
-    "enable_manual_password_entry": {
-      "description": "Enable the manual password entry button",
-      "type": "boolean",
-      "default": false
-    },
-    "expire_hash_on_use": {
-      "description": "Remove matching hashes when an alert is triggered. This is useful if the extension can't always detect password resets.",
-      "type": "boolean",
-      "default": true
-    },
-    "username_selectors": {
-      "description": "Custom selectors to find usernames on a login page",
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
-    },
-    "username_regexes": {
-      "description": "Custom regexes to define the form of usernames so that passwords don't slip in",
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
-    }
-  }
+	"properties": {
+		"data_expiry": {
+			"description": "Number of days that hashed data (passwords and DOM hashes) are cached",
+			"type": "integer",
+			"default": 30
+		},
+		"display_reuse_alerts": {
+			"description": "Trigger alert pop-up notifications for the user when a password reuse is detected",
+			"type": "boolean",
+			"default": true
+		},
+		"enable_debug_gui": {
+			"description": "Allow users access to the debug GUI. This is particularly useful in the initial rollout stages to test different configurations.",
+			"type": "boolean",
+			"default": true
+		},
+		"enterprise_domains": {
+			"description": "Domains where corporate passwords are approved to be entered",
+			"type": "array",
+			"items": {
+				"type": "string"
+			}
+		},
+		"faq_link": {
+			"description": "Link to a FAQ explaining what PhishCatch does",
+			"type": "string"
+		},
+		"ignored_domains": {
+			"description": "Domains which will be ignored by the extension",
+			"type": "array",
+			"items": {
+				"type": "string"
+			}
+		},
+		"manual_password_entry": {
+			"description": "Enable the manual password entry button",
+			"type": "boolean",
+			"default": false
+		},
+		"pbkdf2_iterations": {
+			"description": "Number of pbkdf2 iterations to perform when hashing passwords. Don't change this unless you know what you're doing",
+			"type": "integer",
+			"default": 100000
+		},
+		"phishcatch_server": {
+			"description": "URL of the PhishCatch server",
+			"type": "string"
+		},
+		"hash_truncation_amount": {
+			"description": "Number of characters to truncate saved hashes by",
+			"type": "integer"
+		},
+		"psk": {
+			"description": "Preshared key as configured on the PhishCatch server",
+			"type": "string"
+		},
+		"repo_link": {
+			"description": "Link to the PhishCatch source code, for intrepid users",
+			"type": "string"
+		},
+		"url_sanitization_level": {
+			"description": "Default level of sanitization to perform before reporting URL to server",
+			"type": "string",
+			"default": "host"
+		},
+		"expire_hash_on_use": {
+			"description": "Remove matching hashes when an alert is triggered. This is useful if the extension can't always detect password resets.",
+			"type": "boolean",
+			"default": true
+		},
+		"username_regexes": {
+			"description": "Custom regexes to define the form of usernames so that passwords don't slip in",
+			"type": "array",
+			"items": {
+				"type": "string"
+			}
+		},
+		"username_selectors": {
+			"description": "Custom selectors to find usernames on a login page",
+			"type": "array",
+			"items": {
+				"type": "string"
+			}
+		}
+	},
+	"type": "object"
 }
