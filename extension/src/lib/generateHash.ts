@@ -37,7 +37,10 @@ export async function hashPasswordWithSalt(key: string, salt: string): Promise<C
       if (err) {
         reject(err)
       } else {
-        const hash = derivedKey.toString('hex')
+        let hash = derivedKey.toString('hex')
+        if (config.hash_truncation_amount > 0) {
+          hash = hash.slice(0, -config.hash_truncation_amount)
+        }
 
         const passwordHash = {
           hash,

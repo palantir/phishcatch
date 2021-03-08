@@ -22,17 +22,6 @@ afterAll((done) => {
   chrome.storage.local.clear(done)
 })
 
-beforeAll(async () => {
-  await setConfigOverride({
-    enterprise_domains: [],
-    phishcatch_server: '',
-    psk: '',
-    data_expiry: 30,
-    display_reuse_alerts: true,
-    ignored_domains: [],
-  })
-})
-
 describe('User data should expire after the configured period of time', () => {
   beforeAll(async () => {
     const yesterday = new Date()

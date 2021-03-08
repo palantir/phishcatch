@@ -13,18 +13,20 @@
 // limitations under the License.
 
 export interface Prefs {
-  enterprise_domains: string[]
-  ignored_domains: string[]
-  phishcatch_server: string
   data_expiry: number
   display_reuse_alerts: boolean
-  psk: string
-  url_sanitization_level: UrlSanitizationEnum
-  pbkdf2_iterations: number
-  faq_link: string | null
-  repo_link: string | null
   enable_debug_gui: boolean
+  enterprise_domains: string[]
+  expire_hash_on_use: boolean
+  faq_link: string | null
+  hash_truncation_amount: number
+  ignored_domains: string[]
   manual_password_entry: boolean
+  pbkdf2_iterations: number
+  phishcatch_server: string
+  psk: string
+  repo_link: string | null
+  url_sanitization_level: UrlSanitizationEnum
   username_selectors: string[]
   username_regexes: string[]
 }

@@ -18,7 +18,7 @@ import * as crypto from 'crypto'
 import { handlePasswordEntry } from '../background'
 import { hashPasswordWithSalt } from '../lib/generateHash'
 import { getPasswordHashes, checkStoredHashes, hashAndSavePassword, removeHash } from '../lib/userInfo'
-import { setConfigOverride } from '../config'
+import { setConfigOverride, getConfig } from '../config'
 import { PasswordContent, PasswordHandlingReturnValue, PasswordHash } from '../types'
 import { getHashDataIfItExists, checkForExistingAccount } from '../lib/userInfo'
 import { getHostFromUrl } from '../lib/getHostFromUrl'
@@ -40,24 +40,19 @@ const ignoredDomain = 'ignored.com'
 const ignoredUrl = 'http://ignored.com/bar'
 const evilUrl = 'http://evil.com/foo'
 
-beforeAll(async () => {
-  await setConfigOverride({
-    enterprise_domains: [enterpriseDomain],
-    phishcatch_server: '',
-    psk: '',
-    data_expiry: 90,
-    display_reuse_alerts: false,
-    ignored_domains: [ignoredDomain],
-    pbkdf2_iterations: 100000,
-  })
-})
-
-afterAll((done) => {
-  chrome.storage.local.clear(done)
-})
-
 describe('Password hashing should work', () => {
   it('A password should always hash to the same value (given the salt is the same)', async () => {
+    await setConfigOverride({
+      enterprise_domains: [enterpriseDomain],
+      phishcatch_server: '',
+      psk: '',
+      data_expiry: 90,
+      display_reuse_alerts: false,
+      ignored_domains: [ignoredDomain],
+      pbkdf2_iterations: 100000,
+      expire_hash_on_use: false
+    })
+
     const firstHash = await hashPasswordWithSalt(passwordOne, salt)
     expect(firstHash.hash).toEqual(
       '64784cee716bd764a8ca4c51ee4a931d33ab7d2a38ae80ce675c70571f44724b7d8837b2b2f3c9d1f77923a193e0a0ff38dfeaca706e10554fe08afb4caeb519',
@@ -329,5 +324,80 @@ describe('Password message handling works as expected', () => {
     }
 
     expect(await handlePasswordEntry(message)).toEqual(PasswordHandlingReturnValue.NoReuse)
+  })
+
+  it('Setting expire_hash_on_use should prevent passwords from alerting twice', async () => {
+    await setConfigOverride({
+      enterprise_domains: [enterpriseDomain],
+      phishcatch_server: '',
+      psk: '',
+      data_expiry: 90,
+      display_reuse_alerts: false,
+      ignored_domains: [ignoredDomain],
+      pbkdf2_iterations: 100000,
+      expire_hash_on_use: true
+    })
+
+
+    let message: PasswordContent = {
+      password: passwordToBeSaved,
+      save: true,
+      url: enterpriseUrl,
+      referrer: 'doesntmatter.com',
+      timestamp: new Date().getTime(),
+      username: 'exampleUsername',
+    }
+
+    expect(await handlePasswordEntry(message)).toEqual(PasswordHandlingReturnValue.EnterpriseSave)
+    expect((await checkStoredHashes(passwordToBeSaved)).hashExists).toEqual(true)
+
+    message = {
+      password: passwordToBeSaved,
+      save: false,
+      url: evilUrl,
+      referrer: 'doesntmatter.com',
+      timestamp: new Date().getTime(),
+      username: 'exampleUsername',
+    }
+
+    expect(await handlePasswordEntry(message)).toEqual(PasswordHandlingReturnValue.ReuseAlert)
+    expect((await checkStoredHashes(passwordToBeSaved)).hashExists).toEqual(false)
+  })
+})
+
+describe('Password hash truncation works', () => {
+  beforeAll(async () => {
+    await setConfigOverride({
+      enterprise_domains: [enterpriseDomain],
+      phishcatch_server: '',
+      psk: '',
+      data_expiry: 90,
+      display_reuse_alerts: false,
+      ignored_domains: [ignoredDomain],
+      pbkdf2_iterations: 100000,
+      hash_truncation_amount: 10,
+    })
+  })
+
+  it('Truncating password hashes should work', async () => {
+    const firstHash = await hashPasswordWithSalt(passwordOne, salt)
+    expect(firstHash.hash).toEqual(
+      '64784cee716bd764a8ca4c51ee4a931d33ab7d2a38ae80ce675c70571f44724b7d8837b2b2f3c9d1f77923a193e0a0ff38dfeaca706e10554fe08a',
+    )
+  })
+
+  it('Saving and checking multiple passwords should work', async () => {
+    await hashAndSavePassword('lkef', 'powekfpokr98', 'oiejf9237')
+    await hashAndSavePassword('4j2r903jfioemf')
+    await hashAndSavePassword('oemfoemfiwe.x.d,<<<')
+
+    expect((await checkStoredHashes('lkef')).hashExists).toEqual(true)
+    expect((await checkStoredHashes('4j2r903jfioemf')).hashExists).toEqual(true)
+    expect((await checkStoredHashes('oemfoemfiwe.x.d,<<<')).hashExists).toEqual(true)
+  })
+
+  it('Saving and checking weird passwords should work', async () => {
+    await hashAndSavePassword(emojiPassword)
+    expect((await checkStoredHashes(emojiPassword)).hashExists).toEqual(true)
   })
 })

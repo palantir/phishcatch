@@ -23,7 +23,7 @@ import {
   AlertTypes,
   PasswordHash,
 } from './types'
-import { hashAndSavePassword as hashAndSavePassword, saveUsername, getHashDataIfItExists } from './lib/userInfo'
+import { hashAndSavePassword as hashAndSavePassword, saveUsername, getHashDataIfItExists, removeHash } from './lib/userInfo'
 import { checkDOMHash, saveDOMHash } from './lib/domhash'
 import { showCheckmarkIfEnterpriseDomain } from './lib/showCheckmarkIfEnterpriseDomain'
 import { createServerAlert } from './lib/sendAlert'
@@ -76,7 +76,7 @@ export async function handlePasswordEntry(message: PasswordContent) {
   } else if ((await getDomainType(host)) === DomainType.DANGEROUS) {
     const hashData = await getHashDataIfItExists(password)
     if (hashData) {
-      void handlePasswordLeak(message, hashData)
+      await handlePasswordLeak(message, hashData)
       return PasswordHandlingReturnValue.ReuseAlert
     }
   } else {
@@ -94,6 +94,7 @@ async function handlePasswordLeak(message: PasswordContent, hashData: PasswordHa
     associatedHostname: hashData.hostname || '',
     associatedUsername: hashData.username || '',
   }
+
   void createServerAlert(alertContent)
 
   if (config.display_reuse_alerts) {
@@ -112,6 +113,10 @@ async function handlePasswordLeak(message: PasswordContent, hashData: PasswordHa
     chrome.notifications.create(opt, (id) => {
       addNotitication({ id, hash: hashData.hash, url: message.url })
     })
+  }
+
+  if (config.expire_hash_on_use) {
+    await removeHash(hashData.hash)
   }
 }
 
