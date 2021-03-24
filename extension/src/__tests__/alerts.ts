@@ -28,8 +28,8 @@ Object.defineProperty(global.self, 'crypto', {
 const yesterday = new Date()
 yesterday.setDate(yesterday.getDate() - 1)
 
-const tenDaysAgo = new Date()
-tenDaysAgo.setDate(tenDaysAgo.getDate() - 31)
+const lastMonth = new Date()
+lastMonth.setDate(lastMonth.getDate() - 31)
 
 const alertWithPassword = {
   url: 'eoijeor.com',
@@ -44,7 +44,7 @@ const alertWithPassword = {
 const oldAlert = {
   url: 'kejfkejf.com',
   referrer: 'fefef',
-  timestamp: tenDaysAgo.getTime(),
+  timestamp: lastMonth.getTime(),
   alertType: AlertTypes.REUSE,
   associatedUsername: 'efjkejflef',
   associatedHostname: 'ekfjlkejflkse.me',

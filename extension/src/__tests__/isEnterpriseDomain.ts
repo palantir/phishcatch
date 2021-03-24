@@ -19,6 +19,7 @@ import { getHostFromUrl } from '../lib/getHostFromUrl'
 
 const enterpriseDomain = 'corporate.com'
 const wildcardEnterpriseDomain = '*.enterprise.com'
+const wildcardEnterpriseSubDomain = '*.sub.bigcorp.com'
 
 const enterpriseUrlWithoutTLD = 'https://foo-bar-baz'
 
@@ -30,7 +31,7 @@ const evilSubDomain = 'foo.evil.com'
 
 beforeAll(async () => {
   await setConfigOverride({
-    enterprise_domains: [enterpriseDomain, wildcardEnterpriseDomain],
+    enterprise_domains: [enterpriseDomain, wildcardEnterpriseDomain, wildcardEnterpriseSubDomain],
     phishcatch_server: '',
     psk: '',
     data_expiry: 90,
@@ -51,6 +52,21 @@ describe('We should be able to identify enterprise and ignored domains', () => {
   it('Enterprise subdomains should be recognized, given a wildcard', async () => {
     expect(await getDomainType('foo.enterprise.com')).toBe(DomainType.ENTERPRISE)
     expect(await getDomainType('test.foo.enterprise.com')).toBe(DomainType.ENTERPRISE)
+  })
+
+  it('Wildcards should behave correctly', async () => {
+    expect(await getDomainType('sub.bigcorp.com')).toBe(DomainType.ENTERPRISE)
+    expect(await getDomainType('something.sub.bigcorp.com')).toBe(DomainType.ENTERPRISE)
+
+    expect(await getDomainType('somethingsub.bigcorp.com')).toBe(DomainType.DANGEROUS)
+    expect(await getDomainType('somethingsubbigcorp.com')).toBe(DomainType.DANGEROUS)
+    expect(await getDomainType('bigcorp.com')).toBe(DomainType.DANGEROUS)
+    expect(await getDomainType('foo.bigcorp.com')).toBe(DomainType.DANGEROUS)
+
+    expect(await getDomainType('evilenterprise.com')).toBe(DomainType.DANGEROUS)
+    expect(await getDomainType('sub.evilenterprise.com')).toBe(DomainType.DANGEROUS)
+    expect(await getDomainType('enterprise.com.evil.com')).toBe(DomainType.DANGEROUS)
+    expect(await getDomainType('sub.enterprise.com.evil.com')).toBe(DomainType.DANGEROUS)
   })
 
   it('Ignored domains should be recognized as such', async () => {

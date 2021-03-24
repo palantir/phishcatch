@@ -128,9 +128,9 @@ export enum PasswordHandlingReturnValue {
 }
 
 export enum DomainType {
-  ENTERPRISE,
-  IGNORED,
-  DANGEROUS,
+  ENTERPRISE = 'ENTERPRISE',
+  IGNORED = 'IGNORED',
+  DANGEROUS = 'DANGEROUS',
 }
 
 export interface DatedDomHash {

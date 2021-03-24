@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "PhishCatch",
   "description": "Identify and prevent enterprise password leaks",
-  "version": "0.14",
+  "version": "0.15",
   "icons": {
     "128": "icon.png"
   },
