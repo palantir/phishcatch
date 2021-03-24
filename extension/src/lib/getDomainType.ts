@@ -14,6 +14,7 @@
 
 import { getConfig } from '../config'
 import { DomainType } from '../types'
+import { escapeRegExp } from './escapeRegExp'
 
 // https://stackoverflow.com/questions/2814002/private-ip-address-identifier-in-regular-expression/2814102#2814102
 const ipRegexp = new RegExp(
@@ -36,9 +37,14 @@ function hostMatches(host: string, domainList: string[]) {
     if (domain === host) {
       return true
     }
-    if (starRegexp.exec(domain)) {
+    if (starRegexp.test(domain)) {
       const domainWithoutStar = domain.replace('*.', '')
-      const mainDomainRegex = new RegExp(`.*?${domainWithoutStar}$`)
+      if (host === domainWithoutStar) {
+        return true
+      }
+
+      const escapedDomainWithoutStar = escapeRegExp(domainWithoutStar)
+      const mainDomainRegex = new RegExp(`.*?\\.${escapedDomainWithoutStar}$`)
       return mainDomainRegex.test(host)
     }
 
