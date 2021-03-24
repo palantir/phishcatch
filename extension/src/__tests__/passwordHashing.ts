@@ -18,8 +18,8 @@ import * as crypto from 'crypto'
 import { handlePasswordEntry } from '../background'
 import { hashPasswordWithSalt } from '../lib/generateHash'
 import { getPasswordHashes, checkStoredHashes, hashAndSavePassword, removeHash } from '../lib/userInfo'
-import { setConfigOverride, getConfig } from '../config'
-import { PasswordContent, PasswordHandlingReturnValue, PasswordHash } from '../types'
+import { setConfigOverride } from '../config'
+import { PasswordContent, PasswordHandlingReturnValue } from '../types'
 import { getHashDataIfItExists, checkForExistingAccount } from '../lib/userInfo'
 import { getHostFromUrl } from '../lib/getHostFromUrl'
 
@@ -50,7 +50,7 @@ describe('Password hashing should work', () => {
       display_reuse_alerts: false,
       ignored_domains: [ignoredDomain],
       pbkdf2_iterations: 100000,
-      expire_hash_on_use: false
+      expire_hash_on_use: false,
     })
 
     const firstHash = await hashPasswordWithSalt(passwordOne, salt)
@@ -335,9 +335,8 @@ describe('Password message handling works as expected', () => {
       display_reuse_alerts: false,
       ignored_domains: [ignoredDomain],
       pbkdf2_iterations: 100000,
-      expire_hash_on_use: true
+      expire_hash_on_use: true,
     })
-
 
     let message: PasswordContent = {
       password: passwordToBeSaved,

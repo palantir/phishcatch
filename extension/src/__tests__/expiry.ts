@@ -14,7 +14,6 @@
 
 import { cleanupUsernamesAndPasswords, dateDiffInDays, domHashLimit, passwordHashLimit } from '../lib/timedCleanup'
 import { getPasswordHashes, getUsernames } from '../lib/userInfo'
-import { setConfigOverride } from '../config'
 import { DatedDomHash, PasswordHash, Username } from '../types'
 import { getSavedDomHashes } from '../lib/domhash'
 
@@ -64,8 +63,8 @@ describe('User data should expire after the configured period of time', () => {
     const today = new Date()
 
     expect(dateDiffInDays(today.getTime(), yesterday.getTime())).toEqual(1)
-    expect(dateDiffInDays(today.getTime(), lastMonth.getTime())).toEqual(31)
-    expect(dateDiffInDays(lastMonth.getTime(), today.getTime())).toEqual(31)
+    expect(Math.ceil(dateDiffInDays(today.getTime(), lastMonth.getTime()))).toEqual(31)
+    expect(Math.ceil(dateDiffInDays(lastMonth.getTime(), today.getTime()))).toEqual(31)
   })
 
   it('Old hashes should be deleted', async () => {
