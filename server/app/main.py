@@ -93,7 +93,7 @@ def alert(alert: AlertModel, request: Request, response: Response):
     elif (alert.alertType == "falsepositive"):
         friendly_message = f"A user with associated usernames {alert.allAssociatedUsernames} reported a false positive alert on {alert.alertUrl}."
     elif (alert.alertType == "personalpassword"):
-        friendly_message = f"A user with associated usernames {alert.allAssociatedUsernames} reported that phishcatch alerted on a personal password at {alert.alertUrl}."
+        friendly_message = f"A user with associated usernames {alert.allAssociatedUsernames} reported that PhishCatch alerted on a personal password at {alert.alertUrl}."
     else:
         logging.error("Invalid alert type")
         friendly_message = f"A user with associated usernames {alert.allAssociatedUsernames} fired an unknown alert on {alert.alertUrl}! Referrer: {alert.referrer}. Is the server up to date?"
