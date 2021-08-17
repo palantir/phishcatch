@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>DeveloperToolsAvailability</key>
+	<integer>1</integer>
+	<key>ExtensionInstallAllowlist</key>
+	<array>
+		<string>jgegnlkclgfifjphjmijnkmicfgckmah</string>
+	</array>
+	<key>ExtensionInstallForcelist</key>
+	<array>
+		<string>jgegnlkclgfifjphjmijnkmicfgckmah;https://clients2.google.com/service/update2/crx</string>
+		<string>jgegnlkclgfifjphjmijnkmicfgckmah;https://PATH-TO-INTERNAL-RESOURCE/updates.xml</string>
+	</array>
+</dict>
+</plist>
