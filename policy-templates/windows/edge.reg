@@ -1,0 +1,49 @@
+Windows Registry Editor Version 5.00
+
+; EXTENSION INSTALLATION
+
+; Developer tools are not available on force-installed extensions by default
+; This key permits that availability - useful for debugging, but may permit tampering of extension functionality
+[HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\Edge]
+"DeveloperToolsAvailability"=dword:00000001
+
+; Permits installation of the extension if an ExtensionInstallBlocklist is in place
+[HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\Edge\ExtensionInstallAllowlist]
+"01"="jgegnlkclgfifjphjmijnkmicfgckmah"
+
+; Force-installs the extension
+; If installing from the Chrome Web Store, the Google crx update path must follow the extension ID
+; If installing from an internal source, the path to updates.xml must be included
+[HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\Edge\ExtensionInstallForcelist]
+"01"="jgegnlkclgfifjphjmijnkmicfgckmah;https://clients2.google.com/service/update2/crx"
+"02"="jgegnlkclgfifjphjmijnkmicfgckmah;https://PATH-TO-INTERNAL-RESOURCE/updates.xml"
+
+; EXTENSION CONFIGURATION
+
+; This key must exist with the ID of the extension that was force-installed
+[HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\Edge\3rdparty\extensions\jgegnlkclgfifjphjmijnkmicfgckmah]
+
+; See github.com/palantir/phishcatch/wiki/Configuring-the-extension for configuration options
+[HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\Edge\3rdparty\extensions\jgegnlkclgfifjphjmijnkmicfgckmah\policy]
+"data_expiry"=dword:0000001e
+"display_reuse_alerts"=dword:00000001
+"enable_debug_gui"=dword:00000001
+"expire_hash_on_use"=dword:00000001
+"faq_link"="https://wiki.mydomain.com/PhishCatch"
+"hash_truncation_amount"=dword:00000000
+"manual_password_entry"=dword:00000000
+"pbkdf2_iterations"=dword:000186a0
+"phishcatch_server"="https://phishcatch.mydomain.com"
+"psk"="MYPSK123"
+"repo_link"="https://github.com/palantir/phishcatch"
+"url_sanitization_level"="host"
+
+; List as many domains as necessary - string names are arbitrary (example is numbered sequentially simply for ease of reference)
+[HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\Edge\3rdparty\extensions\jgegnlkclgfifjphjmijnkmicfgckmah\policy\enterprise_domains]
+"00"="mydomain.com"
+"01"="subdomain.mydomain.com"
+
+; List as many domains as necessary - string names are arbitrary (example is numbered sequentially simply for ease of reference)
+[HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\Edge\3rdparty\extensions\jgegnlkclgfifjphjmijnkmicfgckmah\policy\ignored_domains]
+"00"="ignored.mydomain.com"
+"01"="*.ignoreme.local"
