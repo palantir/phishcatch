@@ -27,7 +27,7 @@ export function Home() {
     <div>
       <Card>
         <p>
-          Phishcatch is a browser extension that prevents corporate passwords from being leaked and sends infosec an
+          PhishCatch is a browser extension that prevents corporate passwords from being leaked and sends infosec an
           alert when they are.
         </p>
       </Card>
