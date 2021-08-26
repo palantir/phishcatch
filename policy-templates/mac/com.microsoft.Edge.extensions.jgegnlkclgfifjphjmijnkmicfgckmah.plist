@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>data_expiry</key>
+	<integer>30</integer>
+	<key>display_reuse_alerts</key>
+	<true/>
+	<key>enable_debug_gui</key>
+	<true/>
+	<key>enterprise_domains</key>
+	<array>
+		<string>mydomain.com</string>
+    		<string>subdomain.mydomain.com</string>
+	</array>
+	<key>faq_link</key>
+	<string>https://wiki.mydomain.com/PhishCatch</string>
+	<key>ignored_domains</key>
+	<array>
+		<string>ignored.mydomain.com</string>
+    		<string>*.ignoreme.local</string>
+	</array>
+	<key>manual_password_entry</key>
+	<false/>
+	<key>pbkdf2_iterations</key>
+	<integer>100000</integer>
+	<key>phishcatch_server</key>
+	<string>https://phishcatch.mydomain.com</string>
+	<key>psk</key>
+	<string>MYPSK123</string>
+	<key>repo_link</key>
+	<string>https://github.com/palantir/phishcatch</string>
+	<key>url_sanitization_level</key>
+	<string>host</string>
+</dict>
+</plist>

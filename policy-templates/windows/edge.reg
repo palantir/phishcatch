@@ -1,0 +1,39 @@
+Windows Registry Editor Version 5.00
+
+; EXTENSION INSTALLATION
+
+[HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\Edge]
+"DeveloperToolsAvailability"=dword:00000001
+
+[HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\Edge\ExtensionInstallAllowlist]
+"01"="jgegnlkclgfifjphjmijnkmicfgckmah"
+
+[HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\Edge\ExtensionInstallForcelist]
+"01"="jgegnlkclgfifjphjmijnkmicfgckmah;https://clients2.google.com/service/update2/crx"
+"02"="jgegnlkclgfifjphjmijnkmicfgckmah;https://PATH-TO-INTERNAL-RESOURCE/updates.xml"
+
+; EXTENSION CONFIGURATION
+
+[HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\Edge\3rdparty\extensions\jgegnlkclgfifjphjmijnkmicfgckmah]
+
+[HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\Edge\3rdparty\extensions\jgegnlkclgfifjphjmijnkmicfgckmah\policy]
+"data_expiry"=dword:0000001e
+"display_reuse_alerts"=dword:00000001
+"enable_debug_gui"=dword:00000001
+"expire_hash_on_use"=dword:00000001
+"faq_link"="https://wiki.mydomain.com/PhishCatch"
+"hash_truncation_amount"=dword:00000000
+"manual_password_entry"=dword:00000000
+"pbkdf2_iterations"=dword:000186a0
+"phishcatch_server"="https://phishcatch.mydomain.com"
+"psk"="MYPSK123"
+"repo_link"="https://github.com/palantir/phishcatch"
+"url_sanitization_level"="host"
+
+[HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\Edge\3rdparty\extensions\jgegnlkclgfifjphjmijnkmicfgckmah\policy\enterprise_domains]
+"00"="mydomain.com"
+"01"="subdomain.mydomain.com"
+
+[HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\Edge\3rdparty\extensions\jgegnlkclgfifjphjmijnkmicfgckmah\policy\ignored_domains]
+"00"="ignored.mydomain.com"
+"01"="*.ignoreme.local"
