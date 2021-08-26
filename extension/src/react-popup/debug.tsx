@@ -32,7 +32,7 @@ export class Debug extends React.Component {
 
     return (
       <div style={{ width: '50em', margin: '3em' }}>
-        <h1>Phishcatch Debug</h1>
+        <h1>PhishCatch Debug</h1>
 
         <Card elevation={Elevation.TWO}>
           <h3>Current Config:</h3>

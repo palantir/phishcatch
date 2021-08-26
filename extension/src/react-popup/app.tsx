@@ -81,7 +81,7 @@ export class App extends React.Component {
       <div style={{ width: '50em' }} className="bp3-dark">
         <Navbar>
           <Navbar.Group align={Alignment.LEFT}>
-            <Navbar.Heading>Phishcatch</Navbar.Heading>
+            <Navbar.Heading>PhishCatch</Navbar.Heading>
             {(popupStore.config.repo_link || popupStore.config.faq_link) && <Navbar.Divider />}
             {this.faqLink()}
             {this.repoLink()}
