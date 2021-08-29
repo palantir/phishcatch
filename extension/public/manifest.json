@@ -10,7 +10,7 @@
     "managed_schema": "schema.json"
   },
   "externally_connectable": {},
-  "content_security_policy": "script-src 'self'; object-src 'self'; connect-src https://*",
+  "content_security_policy": "script-src 'self'; object-src 'self'; connect-src http://localhost:* https://*",
   "background": {
     "scripts": [
       "js/background.js",

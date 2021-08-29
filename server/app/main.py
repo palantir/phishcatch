@@ -69,10 +69,11 @@ def health_check():
 def alert(alert: AlertModel, request: Request, response: Response):
     logging.info("Received a credential reuse alert!")
     
-    # if (alert.psk != preshared_key):
-    #     logging.info("Alert did not include correct pre-shared key! Correct key: {preshared_key}. Provided key: {alert.psk}")
-    #     response.status_code = 400
-    #     return {"status": "Incorrect PSK"}
+    if (preshared_key):
+        if (alert.psk != preshared_key):
+            logging.info("Alert did not include correct pre-shared key! Correct key: {preshared_key}. Provided key: {alert.psk}")
+            response.status_code = 400
+            return {"status": "Incorrect PSK"}
 
     logging_message = f"src_ip={request.client.host} "
 
@@ -136,7 +137,7 @@ def send_slack_alert(username: str, message: str, emoji: str):
     }
 
     response = requests.post(
-        webhook_url, 
+        str(webhook_url), 
         data=json.dumps(data), 
         headers={'Content-Type': 'application/json'}
     )
