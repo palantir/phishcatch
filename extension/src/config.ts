@@ -39,6 +39,7 @@ const defaults: Prefs = {
   url_sanitization_level: UrlSanitizationEnum.host,
   username_regexes: [],
   username_selectors: [],
+  banned_urls: [],
 }
 
 let configCache: configCache | false = false
