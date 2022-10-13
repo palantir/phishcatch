@@ -5,5 +5,6 @@ module.exports = {
     "transform": {
         "^.+\\.ts$": "ts-jest"
     },
-    "setupFiles": ['jest-webextension-mock'],      
+    "setupFiles": ['jest-webextension-mock'],   
+    testEnvironment: 'jest-environment-jsdom'   
 }; 

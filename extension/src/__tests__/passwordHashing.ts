@@ -135,19 +135,20 @@ describe('Hash saving/checking should work', () => {
     expect(hashes.length).toEqual(1)
   })
 
-  it('Saving the same password should update the associated metadata', async (callback) => {
-    let hashes = await getPasswordHashes()
-    const oldHashTimestamp = hashes[0].dateAdded
+  it('Saving the same password should update the associated metadata', (callback) => {
+    let hashes = getPasswordHashes().then((hashes) => {
+      const oldHashTimestamp = hashes[0].dateAdded
 
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    setTimeout(async () => {
-      await hashAndSavePassword(passwordOne, 'username2', 'anotherhostname.com')
-      hashes = await getPasswordHashes()
-      expect(hashes[0].dateAdded).toBeGreaterThan(oldHashTimestamp)
-      expect(hashes[0].username).toEqual('username2')
-      expect(hashes[0].hostname).toEqual('anotherhostname.com')
-      callback()
-    }, 100)
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
+      setTimeout(async () => {
+        await hashAndSavePassword(passwordOne, 'username2', 'anotherhostname.com')
+        hashes = await getPasswordHashes()
+        expect(hashes[0].dateAdded).toBeGreaterThan(oldHashTimestamp)
+        expect(hashes[0].username).toEqual('username2')
+        expect(hashes[0].hostname).toEqual('anotherhostname.com')
+        callback()
+      }, 100)
+    })
   })
 
   it('Checking for an existing account works', async () => {
