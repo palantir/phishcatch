@@ -13,6 +13,7 @@
 // limitations under the License.
 
 const path = require('path')
+const webpack = require('webpack');
 const CopyPlugin = require('copy-webpack-plugin')
 const srcDir = '../src/'
 
@@ -25,6 +26,7 @@ module.exports = {
   output: {
     path: path.join(__dirname, '../dist/js'),
     filename: '[name].js',
+    hashFunction: 'xxhash64',
   },
   optimization: {
     splitChunks: {
@@ -43,10 +45,18 @@ module.exports = {
   },
   resolve: {
     extensions: ['.ts', '.tsx', '.js'],
-    fallback: { "buffer": false }
+    fallback: {
+      "buffer": require.resolve('buffer/'),
+      'util': require.resolve('util/')
+    }
   },
   plugins: [
+    new webpack.ProvidePlugin({
+      process: 'process/browser',
+      Buffer: ['buffer', 'Buffer'],
+    }),
     new CopyPlugin({
+      // patterns: [{ from: './public/', to: './' }],
       patterns: [{ from: '.', to: '../', context: 'public' }],
       options: {},
     }),

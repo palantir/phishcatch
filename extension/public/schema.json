@@ -82,6 +82,13 @@
 			"items": {
 				"type": "string"
 			}
+		},
+		"banned_urls": {
+			"description": "Banned URLs. Phishcatch will prevent the user from interacting with these pages.",
+			"type": "array",
+			"items": {
+				"type": "string"
+			}
 		}
 	},
 	"type": "object"

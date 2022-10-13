@@ -29,6 +29,7 @@ export interface Prefs {
   url_sanitization_level: UrlSanitizationEnum
   username_selectors: string[]
   username_regexes: string[]
+  banned_urls: string[]
 }
 
 export enum UrlSanitizationEnum {

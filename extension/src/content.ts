@@ -17,6 +17,7 @@ import { getSanitizedUrl } from './lib/getSanitizedUrl'
 import { getDomainType } from './lib/getDomainType'
 import { DomainType, PasswordContent, UsernameContent } from './types'
 import { getConfig } from './config'
+import { isBannedUrl, setBannedMessage } from './content-lib/bannedMessage'
 
 // wait for page to load before doing anything
 function ready(callbackFunc: () => void) {
@@ -141,6 +142,12 @@ async function checkDomHash() {
   })
 }
 
+async function checkIfUrlBanned() {
+  if (await isBannedUrl(window.location.href)) {
+    setBannedMessage()
+  }
+}
+
 ready(() => {
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   setTimeout(async () => {
@@ -154,3 +161,5 @@ ready(() => {
     }
   }, 1500)
 })
+
+checkIfUrlBanned()

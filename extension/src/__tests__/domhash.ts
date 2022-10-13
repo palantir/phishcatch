@@ -144,19 +144,20 @@ describe('Hash saving/checking should work', () => {
     expect(domHashes.length).toEqual(1)
   })
 
-  it('Saving the same hash should update the timestamp', async (callback) => {
-    let domHashes = await getSavedDomHashes()
-    const datedDomHash = domHashes[0]
-    const originalDate = datedDomHash.dateAdded
-
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    setTimeout(async () => {
-      await saveDOMHash(baseText, enterpriseUrl)
-      domHashes = await getSavedDomHashes()
-
-      expect(domHashes[0].dateAdded).toBeGreaterThan(originalDate)
-      callback()
-    }, 10)
+  it('Saving the same hash should update the timestamp', (callback) => {
+    getSavedDomHashes().then((domHashes) => {
+      const datedDomHash = domHashes[0]
+      const originalDate = datedDomHash.dateAdded
+  
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
+      setTimeout(async () => {
+        await saveDOMHash(baseText, enterpriseUrl)
+        domHashes = await getSavedDomHashes()
+  
+        expect(domHashes[0].dateAdded).toBeGreaterThan(originalDate)
+        callback()
+      }, 10)
+    })
   })
 
   it('We should alert if we see an enterprise-looking hash coming from a non-enterprise domain', async () => {

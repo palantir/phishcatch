@@ -16,12 +16,6 @@
 import * as crypto from 'crypto'
 import { getSalt } from '../lib/generateHash'
 
-Object.defineProperty(global.self, 'crypto', {
-  value: {
-    getRandomValues: (arr: any) => crypto.randomBytes(arr.length),
-  },
-})
-
 describe('Salt should work', () => {
   it('Salts should be long', () => {
     const saltOne = getSalt()
