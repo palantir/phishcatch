@@ -116,3 +116,12 @@ dist
 .pnp.*
 
 .DS_Store
+
+.vscode
+
+.vscode/launch.json
+server/app/__pycache__/main.cpython-311.pyc
+/.idea/inspectionProfiles/Project_Default.xml
+/.idea/vcs.xml
+extension/src/react-app-env.d.ts
+/src/react-app-env.d.ts

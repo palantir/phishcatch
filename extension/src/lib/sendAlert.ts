@@ -46,10 +46,7 @@ export async function getUnsentAlerts(): Promise<UnsentAlert[]> {
 
 export async function saveUnsentAlert(newUnsentAlert: UnsentAlert) {
   let unsentAlerts = await getUnsentAlerts()
-  const isOldAlert = unsentAlerts.some((currentAlert) => {
-    currentAlert.alert.alertTimestamp === newUnsentAlert.alert.alertTimestamp
-  })
-
+  const isOldAlert = unsentAlerts.some((currentAlert) => currentAlert.alert.alertTimestamp === newUnsentAlert.alert.alertTimestamp)
   if (isOldAlert) {
     unsentAlerts = unsentAlerts.map((currentAlert) => {
       if (currentAlert.alert.alertTimestamp === newUnsentAlert.alert.alertTimestamp) {

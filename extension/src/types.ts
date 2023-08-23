@@ -134,6 +134,10 @@ export enum DomainType {
   DANGEROUS = 'DANGEROUS',
 }
 
+export enum ProtectedRoutes {
+  'login.microsoftonline.com' = 'login.microsoftonline.com'
+}
+
 export interface DatedDomHash {
   hash: string
   dateAdded: number

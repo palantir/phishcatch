@@ -4,7 +4,8 @@
   "description": "Identify and prevent enterprise password leaks",
   "version": "0.16",
   "icons": {
-    "128": "icon.png"
+    "128": "icon.png",
+    "129": "hacker.png"
   },
   "storage": {
     "managed_schema": "schema.json"

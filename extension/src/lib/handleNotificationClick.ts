@@ -19,7 +19,7 @@ import { createServerAlert } from './sendAlert'
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 const notificationStorage: Map<string, NotificationData> = new Map()
 
-export function addNotitication(data: NotificationData) {
+export function addNotification(data: NotificationData) {
   notificationStorage.set(data.id, data)
 }
 

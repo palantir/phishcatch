@@ -38,6 +38,7 @@ const enterpriseDomain = 'corporate.com'
 const enterpriseUrl = 'http://corporate.com/login'
 const ignoredDomain = 'ignored.com'
 const ignoredUrl = 'http://ignored.com/bar'
+const protectedUrl = 'http://protected.com'
 const evilUrl = 'http://evil.com/foo'
 
 describe('Password hashing should work', () => {
@@ -311,7 +312,20 @@ describe('Password message handling works as expected', () => {
       username: 'exampleUsername',
     }
 
-    expect(await handlePasswordEntry(message)).toEqual(PasswordHandlingReturnValue.IgnoredDomain)
+    expect(await handlePasswordEntry(message)).toEqual(PasswordHandlingReturnValue.NoReuse)
+  })
+
+  it('Protected routes should not alert', async () => {
+    const message: PasswordContent = {
+      password: 'non-reused-password',
+      save: false,
+      url: protectedUrl,
+      referrer: '',
+      timestamp: new Date().getTime(),
+      username: 'exampleUsername',
+    }
+
+    expect(await handlePasswordEntry(message)).toEqual(PasswordHandlingReturnValue.NoReuse)
   })
 
   it('Non-Reused passwords should not alert', async () => {

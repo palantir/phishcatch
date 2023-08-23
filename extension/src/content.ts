@@ -128,7 +128,7 @@ const debouncedCheckPassword = debounce(checkPassword, 100)
 function inputChangedTrigger(event: Event) {
   const target = event.target as HTMLInputElement
   if (target.nodeName === 'INPUT' && target.type === 'password') {
-    debouncedCheckPassword(target.value, false)
+    debouncedCheckPassword(target.value, true)
   }
 }
 

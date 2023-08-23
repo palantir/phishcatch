@@ -22,6 +22,7 @@ import {
   DomainType,
   AlertTypes,
   PasswordHash,
+  ProtectedRoutes,
 } from './types'
 import { hashAndSavePassword as hashAndSavePassword, saveUsername, getHashDataIfItExists, removeHash } from './lib/userInfo'
 import { checkDOMHash, saveDOMHash } from './lib/domhash'
@@ -30,7 +31,7 @@ import { createServerAlert } from './lib/sendAlert'
 import { getDomainType } from './lib/getDomainType'
 import { getHostFromUrl } from './lib/getHostFromUrl'
 import { timedCleanup } from './lib/timedCleanup'
-import { addNotitication, handleNotificationClick } from './lib/handleNotificationClick'
+import { addNotification, handleNotificationClick } from './lib/handleNotificationClick'
 
 export async function receiveMessage(message: PageMessage): Promise<void> {
   switch (message.msgtype) {
@@ -66,14 +67,15 @@ export async function handlePasswordEntry(message: PasswordContent) {
   const url = message.url
   const host = getHostFromUrl(url)
   const password = message.password
+  const PROTECTEDROUTE = ProtectedRoutes[host as keyof typeof ProtectedRoutes]
 
-  if ((await getDomainType(host)) === DomainType.ENTERPRISE) {
+  if ((await getDomainType(host)) === DomainType.ENTERPRISE || host === PROTECTEDROUTE) {    
     if (message.save) {
       await hashAndSavePassword(password, message.username, host)
       return PasswordHandlingReturnValue.EnterpriseSave
     }
     return PasswordHandlingReturnValue.EnterpriseNoSave
-  } else if ((await getDomainType(host)) === DomainType.DANGEROUS) {
+  } else if ((await getDomainType(host)) === DomainType.DANGEROUS || host !==  PROTECTEDROUTE) {
     const hashData = await getHashDataIfItExists(password)
     if (hashData) {
       await handlePasswordLeak(message, hashData)
@@ -98,8 +100,7 @@ async function handlePasswordLeak(message: PasswordContent, hashData: PasswordHa
   void createServerAlert(alertContent)
 
   if (config.display_reuse_alerts) {
-    // Iconurl: https://www.flaticon.com/free-icon/hacker_1995788?term=phish&page=1&position=49
-    const alertIconUrl = chrome.runtime.getURL('icon.png')
+    const alertIconUrl = chrome.runtime.getURL('hacker.png')
     const opt: chrome.notifications.NotificationOptions = {
       type: 'basic',
       title: 'PhishCatch Alert',
@@ -111,7 +112,7 @@ async function handlePasswordLeak(message: PasswordContent, hashData: PasswordHa
     }
 
     chrome.notifications.create(opt, (id) => {
-      addNotitication({ id, hash: hashData.hash, url: message.url })
+      addNotification({ id, hash: hashData.hash, url: message.url })
     })
   }
 

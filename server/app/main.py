@@ -99,7 +99,7 @@ def alert(alert: AlertModel, request: Request, response: Response):
         logging.error("Invalid alert type")
         friendly_message = f"A user with associated usernames {alert.allAssociatedUsernames} fired an unknown alert on {alert.alertUrl}! Referrer: {alert.referrer}. Is the server up to date?"
 
-    if alert.suspectedUsername is not 'null' and alert.suspectedUsername is not 'null':
+    if alert.suspectedUsername != 'null' and alert.suspectedUsername != 'null':
         friendly_message += f" Suspected account for this leak: {alert.suspectedUsername} from {alert.suspectedHost}."
     friendly_message += f" Referrer: {alert.referrer}. Timestamp: {alert.alertTimestamp}. Client ID: {alert.clientId}."
     friendly_message += f" Request IP: {request.client.host}"
