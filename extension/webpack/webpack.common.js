@@ -28,12 +28,6 @@ module.exports = {
     filename: '[name].js',
     hashFunction: 'xxhash64',
   },
-  optimization: {
-    splitChunks: {
-      name: 'vendor',
-      chunks: 'initial',
-    },
-  },
   module: {
     rules: [
       {
