@@ -1,0 +1,1 @@
+Service Worker was not loading properly. No errors in the service worker console that I could see. I asked Cursor to check the build output and it found that getHostFromUrl on L36 was not in the bundle causing a runtime error when the Service Worker loads. Fixed by modifying chunking in the webpack config

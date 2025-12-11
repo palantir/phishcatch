@@ -30,8 +30,20 @@ module.exports = {
   },
   optimization: {
     splitChunks: {
-      name: 'vendor',
-      chunks: 'initial',
+      cacheGroups: {
+        default: false,
+        vendors: false,
+        // Don't split background - it needs all dependencies bundled for Manifest V3
+        vendor: {
+          test: /[\\/]node_modules[\\/]/,
+          name: 'vendor',
+          chunks: (chunk) => {
+            // Only create vendor chunk for popup and content, NOT background
+            return chunk.name !== 'background';
+          },
+          enforce: true,
+        },
+      },
     },
   },
   module: {
