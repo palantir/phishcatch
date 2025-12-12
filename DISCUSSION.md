@@ -36,3 +36,4 @@ Once the intercepted data is processed in the background service worker, alerts 
 2. Be great to rework the structure of the project. Having a libs folder is an older paradigm. Nothing wrong with it, I just don't see it used much recently. Would prefer to divide out by domain (content/background/interceptor)
 3. Use a type safe messenger, something like webext messenger for send/recieve messages
 4. Change the config to use .env instead of hard coded in the config.ts file
+5. Continute cleaning up types
