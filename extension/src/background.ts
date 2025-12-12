@@ -15,15 +15,17 @@
 import { getConfig } from './config'
 import {
   PageMessage,
-  UsernameContent,
   PasswordContent,
-  DomstringContent,
   PasswordHandlingReturnValue,
   DomainType,
-  AlertTypes,
+  Alerts,
   PasswordHash,
+  ConversationContent,
+  CredentialAlert,
+  ConversationAlert,
 } from './types'
-import { hashAndSavePassword as hashAndSavePassword, saveUsername, getHashDataIfItExists, removeHash } from './lib/userInfo'
+import { hashAndSavePassword as hashAndSavePassword, saveUsername, getHashDataIfItExists, removeHash, getUsernames } from './lib/userInfo'
+import { getId } from './lib/clientId'
 import { checkDOMHash, saveDOMHash } from './lib/domhash'
 import { showCheckmarkIfEnterpriseDomain } from './lib/showCheckmarkIfEnterpriseDomain'
 import { createServerAlert } from './lib/sendAlert'
@@ -38,7 +40,7 @@ export async function receiveMessage(message: PageMessage): Promise<void> {
       break
     }
     case 'username': {
-      const content = <UsernameContent>message.content
+      const content = message.content
 
       if ((await getDomainType(getHostFromUrl(content.url))) === DomainType.ENTERPRISE) {
         void saveUsername(content.username)
@@ -47,15 +49,21 @@ export async function receiveMessage(message: PageMessage): Promise<void> {
       break
     }
     case 'password': {
-      const content = <PasswordContent>message.content
+      const content = message.content
       if (content.password) {
         void handlePasswordEntry(content)
       }
       break
     }
     case 'domstring': {
-      const content = <DomstringContent>message.content
+      const content = message.content
       void checkDOMHash(content.dom, content.url)
+      break
+    }
+
+    case 'conversation': {
+      const content = message.content
+      void handleConversationRequest(content)
       break
     }
   }
@@ -86,13 +94,40 @@ export async function handlePasswordEntry(message: PasswordContent) {
   return PasswordHandlingReturnValue.NoReuse
 }
 
+async function handleConversationRequest(message: ConversationContent) {
+  const config = await getConfig()
+  const clientId = await getId()
+
+  const alert: ConversationAlert = {
+    type: Alerts.CONVERSATION,
+    content: message,
+    timestamp: Date.now(),
+    psk: config.psk,
+    clientId,
+  }
+
+  void createServerAlert(alert)
+}
+
 async function handlePasswordLeak(message: PasswordContent, hashData: PasswordHash) {
   const config = await getConfig()
-  const alertContent = {
-    ...message,
-    alertType: AlertTypes.REUSE,
-    associatedHostname: hashData.hostname || '',
-    associatedUsername: hashData.username || '',
+
+  // Get all usernames for the credential alert
+  const usernames = (await getUsernames()).map((u) => u.username)
+  const clientId = await getId()
+
+  const alertContent: CredentialAlert = {
+    type: Alerts.REUSE,
+    timestamp: message.timestamp,
+    psk: config.psk,
+    clientId,
+    content: {
+      allAssociatedUsernames: JSON.stringify(usernames),
+      alertUrl: message.url,
+      suspectedUsername: message.username || hashData.username,
+      suspectedHost: hashData.hostname,
+      referrer: message.referrer,
+    }
   }
 
   void createServerAlert(alertContent)

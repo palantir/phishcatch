@@ -13,21 +13,9 @@
 // limitations under the License.
 
 import { getConfig } from '../config'
-import { AlertContent, AlertTypes } from '../types'
+import { Alert, Alerts } from '../types'
 import { getUsernames } from './userInfo'
 import { getId } from './clientId'
-
-interface Alert {
-  allAssociatedUsernames: string
-  alertUrl: string
-  psk: string
-  alertTimestamp: number
-  clientId: string
-  suspectedUsername?: string
-  suspectedHost?: string
-  referrer?: string
-  alertType: AlertTypes
-}
 
 interface UnsentAlert {
   alert: Alert
@@ -47,12 +35,12 @@ export async function getUnsentAlerts(): Promise<UnsentAlert[]> {
 export async function saveUnsentAlert(newUnsentAlert: UnsentAlert) {
   let unsentAlerts = await getUnsentAlerts()
   const isOldAlert = unsentAlerts.some((currentAlert) => {
-    currentAlert.alert.alertTimestamp === newUnsentAlert.alert.alertTimestamp
+    currentAlert.alert.timestamp === newUnsentAlert.alert.timestamp
   })
 
   if (isOldAlert) {
     unsentAlerts = unsentAlerts.map((currentAlert) => {
-      if (currentAlert.alert.alertTimestamp === newUnsentAlert.alert.alertTimestamp) {
+      if (currentAlert.alert.timestamp === newUnsentAlert.alert.timestamp) {
         currentAlert = newUnsentAlert
       }
 
@@ -88,58 +76,65 @@ export async function sendAlert(alert: Alert) {
       return false
     }
   } catch (error) {
+    // Log so we actually know what the failure is
+    console.error("sendAlert failed", error);
     return false
   }
 }
 
-export async function createServerAlert(message: AlertContent) {
+export async function createServerAlert(alert: Alert) {
   const config = await getConfig()
 
   if (!config.phishcatch_server) {
     return false
   }
 
-  if (checkIfDup(message)) {
-    return false
+  // Populate PSK and clientId for all alerts
+  const clientId = await getId()
+  alert.psk = config.psk
+  alert.clientId = clientId
+
+  // For credential alerts, we need to populate additional fields
+  if (alert.type !== Alerts.CONVERSATION) {
+    // only check for duplicates if it is not a conversation
+    if (checkIfDup(alert)) {
+      return false
+    }
+
+    const usernames = (await getUsernames()).map((username) => username.username)
+    alert.content.allAssociatedUsernames = JSON.stringify(usernames)
   }
 
-  const data: Alert = {
-    alertUrl: message.url,
-    allAssociatedUsernames: '',
-    psk: '',
-    referrer: message.referrer,
-    alertTimestamp: message.timestamp,
-    alertType: message.alertType,
-    suspectedUsername: message.associatedUsername,
-    suspectedHost: message.associatedHostname,
-    clientId: await getId(),
-  }
-
-  const usernames = (await getUsernames()).map((username) => username.username)
-
-  data.allAssociatedUsernames = JSON.stringify(usernames)
-  data.psk = config.psk
-
-  const sentAlert = await sendAlert(data)
+  const sentAlert = await sendAlert(alert)
   if (!sentAlert) {
     void saveUnsentAlert({
-      alert: data,
+      alert,
       tries: 1,
     })
   }
 
-  return data
+  return alert
 }
 
-export function checkIfDup(message: AlertContent) {
+export function checkIfDup(alert: Alert) {
   const thirtySeconds = 30 * 1000
 
-  const dupCheckString = JSON.stringify({
-    url: message.url,
-    alertType: message.alertType,
-    username: message.associatedUsername,
-    hostname: message.associatedHostname,
-  })
+  let dupCheckString: string
+  if (alert.type === Alerts.CONVERSATION) {
+    dupCheckString = JSON.stringify({
+      type: alert.type,
+      url: alert.content.request.url,
+      timestamp: alert.timestamp,
+    })
+  } else {
+    dupCheckString = JSON.stringify({
+      type: alert.type,
+      url: alert.content.alertUrl,
+      username: alert.content.suspectedUsername,
+      hostname: alert.content.suspectedHost,
+      timestamp: alert.timestamp,
+    })
+  }
 
   if (recentAlerts.has(dupCheckString)) {
     const dupDate = recentAlerts.get(dupCheckString)

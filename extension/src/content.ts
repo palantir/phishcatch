@@ -15,7 +15,7 @@
 import { debounce } from './content-lib/debounce'
 import { getSanitizedUrl } from './lib/getSanitizedUrl'
 import { getDomainType } from './lib/getDomainType'
-import { DomainType, PasswordContent, UsernameContent } from './types'
+import { DomainType, PasswordContent, UsernameContent, PageMessage } from './types'
 import { getConfig } from './config'
 import { isBannedUrl, setBannedMessage } from './content-lib/bannedMessage'
 
@@ -151,6 +151,7 @@ async function checkIfUrlBanned() {
 ready(() => {
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   setTimeout(async () => {
+
     if ((await getDomainType(window.location.hostname)) === DomainType.ENTERPRISE) {
       document.addEventListener('focusout', enterpriseFocusOutTrigger)
       document.addEventListener('keydown', entepriseFormSubmissionTrigger, true)
@@ -160,6 +161,25 @@ ready(() => {
       void checkDomHash()
     }
   }, 1500)
-})
+});
 
-checkIfUrlBanned()
+checkIfUrlBanned();
+
+// Listen for messages from the MAIN world interceptor script
+// and forward them to the background script via chrome.runtime
+window.addEventListener('message', (event) => {
+  // Only accept messages from ourselves (same window)
+  if (event.source !== window) {
+    return
+  }
+
+  // Only process messages from our proxy
+  if (event.data?.source === 'phishcatch-proxy-request' && event.data?.message) {
+    const message = event.data.message as PageMessage;
+    try {
+      chrome.runtime.sendMessage(message);
+    } catch (error) {
+      console.error('Failed to send message to background:', error);
+    }
+  }
+});

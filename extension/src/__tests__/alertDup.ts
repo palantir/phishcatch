@@ -13,25 +13,36 @@
 // limitations under the License.
 
 import { checkIfDup } from '../lib/sendAlert'
-import { AlertContent, AlertTypes } from '../types'
+import { Alerts, CredentialAlert } from '../types'
 
 jest.setTimeout(60000)
 
-const alertOne: AlertContent = {
-  url: 'efefef',
-  referrer: 'efffd',
+const alertOne: CredentialAlert = {
+  type: Alerts.DOMHASH,
   timestamp: 1234,
-  alertType: AlertTypes.DOMHASH,
-  associatedUsername: 'fefelmrg',
-  associatedHostname: 'fefe',
+  psk: 'test-psk',
+  clientId: 'test-client-id',
+  content: {
+    allAssociatedUsernames: JSON.stringify(['fefelmrg']),
+    alertUrl: 'efefef',
+    suspectedUsername: 'fefelmrg',
+    suspectedHost: 'fefe',
+    referrer: 'efffd',
+  },
 }
-const alertTwo: AlertContent = {
-  url: '4894jre.com',
-  referrer: 'efkef',
+
+const alertTwo: CredentialAlert = {
+  type: Alerts.FALSEPOSITIVE,
   timestamp: 12345,
-  alertType: AlertTypes.FALSEPOSITIVE,
-  associatedUsername: 'fefelmrg',
-  associatedHostname: 'fefe',
+  psk: 'test-psk',
+  clientId: 'test-client-id',
+  content: {
+    allAssociatedUsernames: JSON.stringify(['fefelmrg']),
+    alertUrl: '4894jre.com',
+    suspectedUsername: 'fefelmrg',
+    suspectedHost: 'fefe',
+    referrer: 'efkef',
+  },
 }
 
 describe('Duplicate alerts should not be sent within 30 seconds', () => {

@@ -58,5 +58,6 @@ export async function generateSaltAndHashPassword(key: string): Promise<Contextl
 }
 
 export function getSalt(): string {
-  return byteToHex(window.crypto.getRandomValues(new Uint8Array(16)))
+  // use globalThis so this works in a service worker and the browser
+  return byteToHex(globalThis.crypto.getRandomValues(new Uint8Array(16)))
 }

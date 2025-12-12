@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { AlertTypes, NotificationData } from '../types'
-import { removeHash } from './userInfo'
+import { Alerts, NotificationData, CredentialAlert } from '../types'
+import { removeHash, getUsernames } from './userInfo'
 import { createServerAlert } from './sendAlert'
+import { getConfig } from '../config'
+import { getId } from './clientId'
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 const notificationStorage: Map<string, NotificationData> = new Map()
@@ -23,10 +25,26 @@ export function addNotitication(data: NotificationData) {
   notificationStorage.set(data.id, data)
 }
 
-export function handleNotificationClick(notifId: string, btnId: number) {
+export async function handleNotificationClick(notifId: string, btnId: number) {
   const notificationData = notificationStorage.get(notifId)
   if (notificationData) {
     const alertIconUrl = chrome.runtime.getURL('icon.png')
+    const config = await getConfig()
+    const usernames = (await getUsernames()).map((u) => u.username)
+    const clientId = await getId()
+
+    const createFalsePositiveAlert = (): CredentialAlert => ({
+      type: Alerts.FALSEPOSITIVE,
+      timestamp: Date.now(),
+      psk: config.psk,
+      clientId,
+      content: {
+        allAssociatedUsernames: JSON.stringify(usernames),
+        alertUrl: notificationData.url,
+        referrer: '',
+      }
+    })
+
     if (btnId === 0) {
       const opt: chrome.notifications.NotificationOptions = {
         type: 'basic',
@@ -37,13 +55,7 @@ export function handleNotificationClick(notifId: string, btnId: number) {
       }
 
       chrome.notifications.create(opt)
-
-      void createServerAlert({
-        referrer: '',
-        url: notificationData.url,
-        timestamp: new Date().getTime(),
-        alertType: AlertTypes.FALSEPOSITIVE,
-      })
+      void createServerAlert(createFalsePositiveAlert())
     } else if (btnId === 1) {
       const opt: chrome.notifications.NotificationOptions = {
         type: 'basic',
@@ -54,13 +66,7 @@ export function handleNotificationClick(notifId: string, btnId: number) {
       }
 
       chrome.notifications.create(opt)
-
-      void createServerAlert({
-        referrer: '',
-        url: notificationData.url,
-        timestamp: new Date().getTime(),
-        alertType: AlertTypes.FALSEPOSITIVE,
-      })
+      void createServerAlert(createFalsePositiveAlert())
     }
 
     void removeHash(notificationData.hash)

@@ -14,7 +14,9 @@
 
 import TlshConstructor from './tlsh'
 import { getConfig } from '../config'
-import { DomainType, TLSHInstance, DatedDomHash, AlertTypes } from '../types'
+import { DomainType, TLSHInstance, DatedDomHash, Alerts, CredentialAlert } from '../types'
+import { getUsernames } from './userInfo'
+import { getId } from './clientId'
 import { getDomainType } from './getDomainType'
 import { createServerAlert } from './sendAlert'
 import { getHostFromUrl } from './getHostFromUrl'
@@ -35,13 +37,22 @@ export function getTlshInstance(str: string) {
 
 export async function alertUser(host: string) {
   const config = await getConfig()
+  const usernames = (await getUsernames()).map((u) => u.username)
+  const clientId = await getId()
 
-  void createServerAlert({
-    timestamp: new Date().getTime(),
-    alertType: AlertTypes.DOMHASH,
-    referrer: '',
-    url: host,
-  })
+  const alert: CredentialAlert = {
+    type: Alerts.DOMHASH,
+    timestamp: Date.now(),
+    psk: config.psk,
+    clientId,
+    content: {
+      allAssociatedUsernames: JSON.stringify(usernames),
+      alertUrl: host,
+      referrer: '',
+    }
+  }
+
+  void createServerAlert(alert)
 
   if (config.display_reuse_alerts) {
     // Iconurl: https://www.flaticon.com/free-icon/hacker_1995788?term=phish&page=1&position=49
