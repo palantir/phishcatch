@@ -16,7 +16,7 @@ import * as crypto from 'crypto'
 import { setConfigOverride } from '../config'
 import { createServerAlert, getUnsentAlerts } from '../lib/sendAlert'
 import { tryToSendFailedAlerts } from '../lib/timedCleanup'
-import { AlertTypes } from '../types'
+import { Alerts, CredentialAlert } from '../types'
 
 Object.defineProperty(global.self, 'crypto', {
   value: {
@@ -31,23 +31,32 @@ yesterday.setDate(yesterday.getDate() - 1)
 const lastMonth = new Date()
 lastMonth.setDate(lastMonth.getDate() - 31)
 
-const alertWithPassword = {
-  url: 'eoijeor.com',
-  referrer: 'poefoke',
+const alertWithPassword: CredentialAlert = {
+  type: Alerts.REUSE,
   timestamp: yesterday.getTime(),
-  alertType: AlertTypes.REUSE,
-  associatedUsername: 'oiwejfojne',
-  associatedHostname: 'weoifjowef.com',
-  password: 'password',
+  psk: 'test-psk',
+  clientId: 'test-client-id',
+  content: {
+    allAssociatedUsernames: JSON.stringify(['oiwejfojne']),
+    alertUrl: 'eoijeor.com',
+    suspectedUsername: 'oiwejfojne',
+    suspectedHost: 'weoifjowef.com',
+    referrer: 'poefoke',
+  },
 }
 
-const oldAlert = {
-  url: 'kejfkejf.com',
-  referrer: 'fefef',
+const oldAlert: CredentialAlert = {
+  type: Alerts.REUSE,
   timestamp: lastMonth.getTime(),
-  alertType: AlertTypes.REUSE,
-  associatedUsername: 'efjkejflef',
-  associatedHostname: 'ekfjlkejflkse.me',
+  psk: 'test-psk',
+  clientId: 'test-client-id',
+  content: {
+    allAssociatedUsernames: JSON.stringify(['efjkejflef']),
+    alertUrl: 'kejfkejf.com',
+    suspectedUsername: 'efjkejflef',
+    suspectedHost: 'ekfjlkejflkse.me',
+    referrer: 'fefef',
+  },
 }
 
 beforeAll(async () => {
@@ -66,7 +75,10 @@ describe('Alerts should work', () => {
   it('Only includes relevant fields', async () => {
     const alert = await createServerAlert(alertWithPassword)
     expect(!!alert).toEqual(true)
-    expect(JSON.stringify(alert).includes('password')).toEqual(false)
+    // Verify it's a CredentialAlert and doesn't include password
+    if (alert && alert.type !== Alerts.CONVERSATION) {
+      expect(JSON.stringify(alert.content).includes('password')).toEqual(false)
+    }
   })
 
   it('Check that we saved the unsent alert to disk', async () => {

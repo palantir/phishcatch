@@ -32,8 +32,15 @@
       "all_frames": true,
       "run_at": "document_idle",
       "js": ["js/vendor.js", "js/content.js"]
+    },
+    {
+      "matches": ["*://*/*"],
+      "all_frames": true,
+      "run_at": "document_start",
+      "world": "MAIN",
+      "js": ["js/interceptor.js"]
     }
   ],
   "host_permissions": ["http://*/*", "https://*/*"],
-  "permissions": ["storage", "notifications", "webRequest"]
+  "permissions": ["storage", "notifications"]
 }

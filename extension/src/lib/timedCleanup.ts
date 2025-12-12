@@ -84,7 +84,7 @@ export async function tryToSendFailedAlerts() {
   const currentDate = new Date().getTime()
 
   let unsentAlerts = (await getUnsentAlerts()).filter((unsentAlert) => {
-    const dateDiff = dateDiffInDays(unsentAlert.alert.alertTimestamp, currentDate)
+    const dateDiff = dateDiffInDays(unsentAlert.alert.timestamp, currentDate)
 
     return dateDiff < 30
   })

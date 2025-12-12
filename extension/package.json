@@ -14,6 +14,7 @@
   "dependencies": {
     "@blueprintjs/core": "^3.32.1",
     "@blueprintjs/icons": "^3.21.0",
+    "@rxliuli/vista": "^0.4.8",
     "jest-environment-jsdom": "^29.1.2",
     "mobx": "^5.15.7",
     "mobx-react": "^6.3.0",

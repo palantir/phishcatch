@@ -22,6 +22,7 @@ module.exports = {
     popup: path.join(__dirname, srcDir + 'popup.tsx'),
     background: path.join(__dirname, srcDir + 'background.ts'),
     content: path.join(__dirname, srcDir + 'content.ts'),
+    interceptor: path.join(__dirname, srcDir + 'interceptor.ts'),
   },
   output: {
     path: path.join(__dirname, '../dist/js'),
@@ -33,13 +34,13 @@ module.exports = {
       cacheGroups: {
         default: false,
         vendors: false,
-        // Don't split background - it needs all dependencies bundled for Manifest V3
+        // Don't split background or interceptor - they need all dependencies bundled
         vendor: {
           test: /[\\/]node_modules[\\/]/,
           name: 'vendor',
           chunks: (chunk) => {
-            // Only create vendor chunk for popup and content, NOT background
-            return chunk.name !== 'background';
+            // Only create vendor chunk for popup and content, NOT background or interceptor
+            return chunk.name !== 'background' && chunk.name !== 'interceptor';
           },
           enforce: true,
         },
@@ -53,10 +54,17 @@ module.exports = {
         use: 'ts-loader',
         exclude: /node_modules/,
       },
+      {
+        test: /\.mjs$/,
+        type: 'javascript/auto',
+      },
     ],
   },
   resolve: {
     extensions: ['.ts', '.tsx', '.js'],
+    alias: {
+      '@rxliuli/vista': path.resolve(__dirname, '../node_modules/@rxliuli/vista/dist/index.mjs'),
+    },
     fallback: {
       "buffer": require.resolve('buffer/'),
       'util': require.resolve('util/')

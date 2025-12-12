@@ -16,8 +16,11 @@ import { Intent } from '@blueprintjs/core'
 import { observable } from 'mobx'
 import { getSanitizedUrl } from '../../lib/getSanitizedUrl'
 import { createServerAlert } from '../../lib/sendAlert'
-import { AlertTypes } from '../../types'
+import { Alerts, CredentialAlert } from '../../types'
 import { AppToaster } from '../toaster'
+import { getConfig } from '../../config'
+import { getUsernames } from '../../lib/userInfo'
+import { getId } from '../../lib/clientId'
 
 class ReportPhishingState {
   @observable isOpen = false
@@ -32,12 +35,23 @@ class ReportPhishingState {
       const tab = tabs[0]
       if (tab && tab.url) {
         const url = await getSanitizedUrl(tab.url)
-        const sentAlert = await createServerAlert({
-          url,
-          referrer: '',
-          timestamp: new Date().getTime(),
-          alertType: AlertTypes.USERREPORT,
-        })
+        const config = await getConfig()
+        const usernames = (await getUsernames()).map((u) => u.username)
+        const clientId = await getId()
+
+        const alert: CredentialAlert = {
+          type: Alerts.USERREPORT,
+          timestamp: Date.now(),
+          psk: config.psk,
+          clientId,
+          content: {
+            allAssociatedUsernames: JSON.stringify(usernames),
+            alertUrl: url,
+            referrer: '',
+          }
+        }
+
+        const sentAlert = await createServerAlert(alert)
         if (sentAlert) {
           AppToaster.show({ message: `Reported ${url}!`, intent: Intent.SUCCESS })
         } else {

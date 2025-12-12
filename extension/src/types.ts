@@ -32,16 +32,75 @@ export interface Prefs {
   banned_urls: string[]
 }
 
+type CredentialAlertContent = {
+  allAssociatedUsernames: string
+  alertUrl: string
+  suspectedUsername?: string
+  suspectedHost?: string
+  referrer?: string
+}
+
+export type CredentialAlert = {
+  type: Exclude<AlertTypes, "conversation">,
+  content: CredentialAlertContent;
+  timestamp: number;
+  psk: string;
+  clientId: string;
+}
+
+export type ConversationAlert = {
+  type: Extract<AlertTypes, "conversation">,
+  content: ConversationContent;
+  timestamp: number;
+  psk: string;
+  clientId: string;
+}
+
+// Prefer discriminated union for alert types
+export type Alert = CredentialAlert | ConversationAlert;
+
+export type HttpMethod = 'GET' | 'PUT' | 'POST' | 'DELETE' | 'OPTIONS' | 'HEAD' | 'PATCH' | 'TRACE';
+
 export enum UrlSanitizationEnum {
   host = 'host',
   path = 'path',
   none = 'none',
 }
 
-export interface PageMessage {
-  msgtype: 'username' | 'password' | 'debug' | 'domstring'
-  content: PasswordContent | UsernameContent | DomstringContent | string
+type PasswordMessage = {
+  msgtype: 'password'
+  content: PasswordContent
 }
+
+type UsernameMessage = {
+  msgtype: 'username'
+  content: UsernameContent
+}
+
+type DomstringMessage = {
+  msgtype: 'domstring'
+  content: DomstringContent
+}
+
+type DebugMessage = {
+  msgtype: 'debug'
+}
+
+type ConversationMessage = {
+  msgtype: 'conversation'
+  content: ConversationContent
+}
+
+export type ConversationContent = {
+  request: {
+    url: string
+    method: HttpMethod
+  },
+  userInputs: string[]
+}
+
+// Prefer discrimiated union over existing interface
+export type PageMessage = PasswordMessage | UsernameMessage | DomstringMessage | DebugMessage | ConversationMessage;
 
 export interface PasswordContent {
   password: string
@@ -52,13 +111,16 @@ export interface PasswordContent {
   username?: string
 }
 
-export enum AlertTypes {
-  REUSE = 'reuse',
-  DOMHASH = 'domhash',
-  USERREPORT = 'userreport',
-  FALSEPOSITIVE = 'falsepositive',
-  PERSONALPASSWORD = 'personalpassword',
-}
+export const Alerts = {
+  REUSE: 'reuse',
+  DOMHASH: 'domhash',
+  USERREPORT: 'userreport',
+  FALSEPOSITIVE: 'falsepositive',
+  PERSONALPASSWORD: 'personalpassword',
+  CONVERSATION: 'conversation'
+} as const;
+
+export type AlertTypes = typeof Alerts[keyof typeof Alerts]
 
 export interface AlertContent {
   url: string

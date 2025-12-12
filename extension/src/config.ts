@@ -33,7 +33,7 @@ const defaults: Prefs = {
   ignored_domains: [],
   manual_password_entry: false,
   pbkdf2_iterations: 100000,
-  phishcatch_server: '',
+  phishcatch_server: 'http://localhost:8000',
   psk: '',
   repo_link: null,
   url_sanitization_level: UrlSanitizationEnum.host,
@@ -81,7 +81,7 @@ export async function getConfigOverride(): Promise<Prefs | false> {
         Object.keys(data.configOverride).forEach((key) => {
           const value = data.configOverride[key]
           if (value || value === false) {
-            ;(prefs as any)[key] = value
+            ; (prefs as any)[key] = value
           }
         })
         resolve(prefs)
@@ -100,7 +100,7 @@ async function getManagedPreferences(): Promise<Prefs> {
       Object.keys(storedPrefs).forEach((key) => {
         const value = (storedPrefs as any)[key]
         if (value || value === false) {
-          ;(prefs as any)[key] = value
+          ; (prefs as any)[key] = value
         }
       })
 
