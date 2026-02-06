@@ -109,9 +109,8 @@ async function handlePasswordLeak(message: PasswordContent, hashData: PasswordHa
       buttons: [{ title: 'This is a false positive' }, { title: `That wasn't my enterprise password` }],
     }
 
-    browser.notifications.create(opt, (id) => {
-      addNotitication({ id, hash: hashData.hash, url: message.url })
-    })
+    const id = await browser.notifications.create(opt)
+    addNotitication({ id, hash: hashData.hash, url: message.url })
   }
 
   if (config.expire_hash_on_use) {

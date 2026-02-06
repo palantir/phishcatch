@@ -36,13 +36,10 @@ interface UnsentAlert {
 }
 
 export async function getUnsentAlerts(): Promise<UnsentAlert[]> {
-  return new Promise((resolve) => {
-    browser.storage.local.get('unsentAlerts', (data) => {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const unsentAlerts: UnsentAlert[] = data.unsentAlerts || []
-      resolve(unsentAlerts)
-    })
-  })
+  const data = await browser.storage.local.get('unsentAlerts')
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const unsentAlerts: UnsentAlert[] = data.unsentAlerts || []
+  return unsentAlerts
 }
 
 export async function saveUnsentAlert(newUnsentAlert: UnsentAlert) {
@@ -63,11 +60,8 @@ export async function saveUnsentAlert(newUnsentAlert: UnsentAlert) {
     unsentAlerts.push(newUnsentAlert)
   }
 
-  return new Promise((resolve) => {
-    browser.storage.local.set({ unsentAlerts }, () => {
-      resolve(true)
-    })
-  })
+  await browser.storage.local.set({ unsentAlerts })
+  return true
 }
 
 export async function sendAlert(alert: Alert) {

@@ -20,23 +20,17 @@ export function generateId() {
 }
 
 export async function saveId(id: string) {
-  return new Promise((resolve, reject) => {
-    browser.storage.local.set({ clientId: id }, () => {
-      resolve(true)
-    })
-  })
+  await browser.storage.local.set({ clientId: id })
+  return true
 }
 
-export function getId(): Promise<string> {
-  return new Promise((resolve, reject) => {
-    browser.storage.local.get('clientId', (data) => {
-      if (!data.clientId) {
-        const newId = generateId()
-        void saveId(newId)
-        resolve(newId)
-      } else {
-        resolve(data.clientId)
-      }
-    })
-  })
+export async function getId(): Promise<string> {
+  const data = await browser.storage.local.get('clientId')
+  if (!data.clientId) {
+    const newId = generateId()
+    void saveId(newId)
+    return newId
+  } else {
+    return data.clientId as string
+  }
 }

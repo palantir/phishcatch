@@ -67,18 +67,12 @@ export async function cleanupUsernamesAndPasswords() {
 
   const datedDomHashes = await cleanData(await getSavedDomHashes(), domHashLimit)
 
-  return new Promise((resolve) => {
-    browser.storage.local.set(
-      {
-        usernames,
-        passwordHashes,
-        datedDomHashes,
-      },
-      () => {
-        resolve(true)
-      },
-    )
+  await browser.storage.local.set({
+    usernames,
+    passwordHashes,
+    datedDomHashes,
   })
+  return true
 }
 
 export async function tryToSendFailedAlerts() {

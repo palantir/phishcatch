@@ -58,61 +58,45 @@ export function initConfigListener() {
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export async function setConfigOverride(newConfig: Object) {
-  return new Promise((resolve, reject) => {
-    try {
-      browser.storage.local.set({ configOverride: newConfig }, () => {
-        clearCache()
-        resolve(true)
-      })
-    } catch (e) {
-      reject()
-    }
-  })
+  await browser.storage.local.set({ configOverride: newConfig })
+  clearCache()
+  return true
 }
 
 export async function clearConfigOverride() {
-  return new Promise((resolve) => {
-    browser.storage.local.set({ configOverride: false }, () => {
-      resolve(true)
-    })
-  })
+  await browser.storage.local.set({ configOverride: false })
+  return true
 }
 
 export async function getConfigOverride(): Promise<Prefs | false> {
-  return new Promise((resolve) => {
-    browser.storage.local.get('configOverride', (data) => {
-      if (data.configOverride) {
-        const prefs = { ...defaults }
+  const data = await browser.storage.local.get('configOverride')
+  if (data.configOverride) {
+    const prefs = { ...defaults }
 
-        Object.keys(data.configOverride).forEach((key) => {
-          const value = data.configOverride[key]
-          if (value || value === false) {
-            ;(prefs as any)[key] = value
-          }
-        })
-        resolve(prefs)
-      } else {
-        resolve(false)
+    Object.keys(data.configOverride).forEach((key) => {
+      const value = data.configOverride[key]
+      if (value || value === false) {
+        ;(prefs as any)[key] = value
       }
     })
-  })
+    return prefs
+  } else {
+    return false
+  }
 }
 
 async function getManagedPreferences(): Promise<Prefs> {
   const prefs = { ...defaults }
 
-  return new Promise((resolve) => {
-    browser.storage.managed.get(Object.keys(prefs), (storedPrefs: Prefs) => {
-      Object.keys(storedPrefs).forEach((key) => {
-        const value = (storedPrefs as any)[key]
-        if (value || value === false) {
-          ;(prefs as any)[key] = value
-        }
-      })
-
-      resolve(prefs)
-    })
+  const storedPrefs = await browser.storage.managed.get(Object.keys(prefs)) as Prefs
+  Object.keys(storedPrefs).forEach((key) => {
+    const value = (storedPrefs as any)[key]
+    if (value || value === false) {
+      ;(prefs as any)[key] = value
+    }
   })
+
+  return prefs
 }
 
 export function clearCache() {

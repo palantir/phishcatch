@@ -36,7 +36,7 @@ export function showCheckmarkIfEnterpriseDomain() {
       void updateBadge(tab)
     })
     browser.tabs.onActivated.addListener((activeInfo) => {
-      browser.tabs.get(activeInfo.tabId, (tab) => {
+      void browser.tabs.get(activeInfo.tabId).then((tab) => {
         void updateBadge(tab)
       })
     })

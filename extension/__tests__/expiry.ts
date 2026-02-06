@@ -43,14 +43,9 @@ describe('User data should expire after the configured period of time', () => {
       { username: '11111111', dateAdded: yesterday.getTime() },
     ]
 
-    return new Promise((resolve) => {
-      chrome.storage.local.set(
-        { passwordHashes: currentPasswordHashes, datedDomHashes: currentDomHashes, usernames: currentUsernames },
-        () => {
-          resolve(true)
-        },
-      )
-    })
+    await chrome.storage.local.set(
+      { passwordHashes: currentPasswordHashes, datedDomHashes: currentDomHashes, usernames: currentUsernames },
+    )
   })
 
   it('Diff in days should work', () => {
@@ -113,13 +108,8 @@ describe(`For performance reasons we shouldn't store an excessive number of hash
       currentDomHashes.push({ hash: '00000000', source: '', dateAdded: oldDate.getTime() })
     }
 
-    return new Promise((resolve) => {
-      chrome.storage.local.set({ passwordHashes: currentPasswordHashes }, () => {
-        chrome.storage.local.set({ datedDomHashes: currentDomHashes }, () => {
-          resolve(true)
-        })
-      })
-    })
+    await chrome.storage.local.set({ passwordHashes: currentPasswordHashes })
+    await chrome.storage.local.set({ datedDomHashes: currentDomHashes })
   })
 
   it('Excess hashes should be deleted', async () => {

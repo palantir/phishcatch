@@ -95,33 +95,23 @@ export async function saveDOMHash(dom: string, url: string) {
     return hashesMatch(storedInstance, instance)
   })
 
-  return new Promise((resolve) => {
-    if (existingHashIndex !== -1) {
-      savedDatedHashes[existingHashIndex].dateAdded = new Date().getTime()
-      resolve(true)
-    } else {
-      savedDatedHashes.push({ hash: currentHash, dateAdded: new Date().getTime(), source: getHostFromUrl(url) })
+  if (existingHashIndex !== -1) {
+    savedDatedHashes[existingHashIndex].dateAdded = new Date().getTime()
+  } else {
+    savedDatedHashes.push({ hash: currentHash, dateAdded: new Date().getTime(), source: getHostFromUrl(url) })
+  }
 
-      browser.storage.local.set({ datedDomHashes: savedDatedHashes }, () => {
-        resolve(true)
-      })
-    }
-  })
+  await browser.storage.local.set({ datedDomHashes: savedDatedHashes })
+  return true
 }
 
 export async function getSavedDomHashes(): Promise<DatedDomHash[]> {
-  return new Promise((resolve) => {
-    browser.storage.local.get('datedDomHashes', (data: { datedDomHashes: DatedDomHash[] | undefined }) => {
-      const hashes: DatedDomHash[] = data.datedDomHashes || []
-      if (!data.datedDomHashes) {
-        browser.storage.local.set({ datedDomHashes: hashes }, () => {
-          resolve(hashes)
-        })
-      } else {
-        resolve(hashes)
-      }
-    })
-  })
+  const data = await browser.storage.local.get('datedDomHashes') as { datedDomHashes: DatedDomHash[] | undefined }
+  const hashes: DatedDomHash[] = data.datedDomHashes || []
+  if (!data.datedDomHashes) {
+    await browser.storage.local.set({ datedDomHashes: hashes })
+  }
+  return hashes
 }
 
 export async function getHashesAsTlshInstances(): Promise<TLSHInstance[]> {
