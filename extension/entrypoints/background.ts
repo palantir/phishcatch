@@ -17,6 +17,7 @@ import { showCheckmarkIfEnterpriseDomain } from '../lib/showCheckmarkIfEnterpris
 import { timedCleanup } from '../lib/timedCleanup'
 import { handleNotificationClick } from '../lib/handleNotificationClick'
 import { initConfigListener } from '../utils/config'
+import { refreshMonitoringRules } from '../lib/activity/monitoringRules'
 
 export default defineBackground({
   main() {
@@ -28,5 +29,9 @@ export default defineBackground({
 
     void showCheckmarkIfEnterpriseDomain()
     timedCleanup()
+
+    void refreshMonitoringRules()
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    setInterval(refreshMonitoringRules, 30 * 60 * 1000)
   },
 })

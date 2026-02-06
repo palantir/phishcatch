@@ -16,6 +16,7 @@ import { browser } from 'wxt/browser'
 import { getConfig } from '../utils/config'
 import { getUsernames, getPasswordHashes } from './userInfo'
 import { getUnsentAlerts, sendAlert } from './sendAlert'
+import { getUnsentActivities, sendActivityToServer } from './activity/sendActivity'
 import { getSavedDomHashes } from './domhash'
 
 const hourValue = 1000 * 60 * 60
@@ -104,8 +105,35 @@ export async function tryToSendFailedAlerts() {
   return unsentAlerts
 }
 
+export async function tryToSendFailedActivities() {
+  const currentDate = new Date().getTime()
+
+  let unsentActivities = (await getUnsentActivities()).filter((unsent) => {
+    return dateDiffInDays(unsent.activity.timestamp, currentDate) < 30
+  })
+
+  unsentActivities = (
+    await Promise.all(
+      unsentActivities.map(async (unsent) => {
+        const sent = await sendActivityToServer(unsent.activity)
+        if (sent) {
+          return null
+        } else {
+          unsent.tries++
+          return unsent
+        }
+      }),
+    )
+  ).filter(notEmpty)
+
+  browser.storage.local.set({ unsentActivities })
+
+  return unsentActivities
+}
+
 export function timedCleanup() {
   void tryToSendFailedAlerts()
+  void tryToSendFailedActivities()
   void cleanupUsernamesAndPasswords()
 
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
@@ -113,4 +141,7 @@ export function timedCleanup() {
 
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   setInterval(tryToSendFailedAlerts, hourValue)
+
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
+  setInterval(tryToSendFailedActivities, hourValue)
 }

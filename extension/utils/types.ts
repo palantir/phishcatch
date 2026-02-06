@@ -39,8 +39,33 @@ export enum UrlSanitizationEnum {
 }
 
 export interface PageMessage {
-  msgtype: 'username' | 'password' | 'debug' | 'domstring'
-  content: PasswordContent | UsernameContent | DomstringContent | string
+  msgtype: 'username' | 'password' | 'debug' | 'domstring' | 'activity'
+  content: PasswordContent | UsernameContent | DomstringContent | ActivityEvent | string
+}
+
+export interface ActivityEvent {
+  eventType: string
+  source: string
+  content: string
+  url: string
+  timestamp: number
+  metadata?: Record<string, string>
+}
+
+export interface MonitoringRule {
+  id: string
+  source: string
+  domains: string[]
+  strategy: 'fetch_intercept'
+  eventType: string
+  fetchConfig: {
+    urlPattern: string
+    method?: string
+    extractPath: (string | number)[]
+    filterPath?: (string | number)[]
+    filterValue?: string
+    join?: string
+  }
 }
 
 export interface PasswordContent {

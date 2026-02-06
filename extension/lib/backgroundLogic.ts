@@ -19,6 +19,7 @@ import {
   UsernameContent,
   PasswordContent,
   DomstringContent,
+  ActivityEvent,
   PasswordHandlingReturnValue,
   DomainType,
   AlertTypes,
@@ -27,6 +28,7 @@ import {
 import { hashAndSavePassword as hashAndSavePassword, saveUsername, getHashDataIfItExists, removeHash } from './userInfo'
 import { checkDOMHash, saveDOMHash } from './domhash'
 import { createServerAlert } from './sendAlert'
+import { sendActivity } from './activity/sendActivity'
 import { getDomainType } from './getDomainType'
 import { getHostFromUrl } from './getHostFromUrl'
 import { addNotitication } from './handleNotificationClick'
@@ -55,6 +57,11 @@ export async function receiveMessage(message: PageMessage): Promise<void> {
     case 'domstring': {
       const content = message.content as DomstringContent
       void checkDOMHash(content.dom, content.url)
+      break
+    }
+    case 'activity': {
+      const content = message.content as ActivityEvent
+      void sendActivity(content)
       break
     }
   }

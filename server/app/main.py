@@ -48,6 +48,36 @@ class AlertModel(BaseModel):
     suspectedHost: Optional[str] = 'null'
     clientId: str
 
+class ActivityModel(BaseModel):
+    eventType: str
+    source: str
+    content: str
+    url: str
+    timestamp: int
+    metadata: Optional[dict] = None
+    psk: str
+    clientId: str
+
+# Monitoring rules served to the extension. To add a new monitored app,
+# add a rule here and release the backend — no extension update needed.
+MONITORING_RULES = [
+    {
+        "id": "chatgpt",
+        "source": "chatgpt",
+        "domains": ["chatgpt.com", "chat.openai.com"],
+        "strategy": "fetch_intercept",
+        "eventType": "user_input",
+        "fetchConfig": {
+            "urlPattern": "/backend-api/conversation",
+            "method": "POST",
+            "extractPath": ["messages", -1, "content", "parts"],
+            "filterPath": ["messages", -1, "role"],
+            "filterValue": "user",
+            "join": "\n"
+        }
+    }
+]
+
 
 ###############################################################################
 # Status endpoint. Used to test connection
@@ -114,6 +144,60 @@ def alert(alert: AlertModel, request: Request, response: Response):
         return {"status": "Couldn't send slack alert"}
 
     return {"status": "alert success"}
+
+###############################################################################
+# Monitoring rules endpoint. Returns rules that tell the extension what to
+# monitor. Update these to add/modify monitored apps — no extension update.
+#
+# curl -X GET http://localhost:8000/monitoring-rules
+#
+###############################################################################
+@app.get("/monitoring-rules")
+def get_monitoring_rules():
+    return MONITORING_RULES
+
+
+###############################################################################
+# Activity logging endpoint. Receives user activity events from the extension.
+#
+# curl -X POST http://localhost:8000/activity --data '{"eventType":"user_input","source":"chatgpt","content":"Hello world","url":"https://chatgpt.com","timestamp":1611703424585,"psk":"foobar","clientId":"foo"}'
+#
+###############################################################################
+@app.post("/activity")
+def log_activity(activity: ActivityModel, request: Request, response: Response):
+    logging.info("Received an activity event!")
+
+    if (preshared_key):
+        if (activity.psk != preshared_key):
+            logging.info(f"Activity did not include correct pre-shared key! Provided key: {activity.psk}")
+            response.status_code = 400
+            return {"status": "Incorrect PSK"}
+
+    logging_message = f"src_ip={request.client.host} "
+    for key, value in activity:
+        if key == "timestamp":
+            value = friendly_timestamp(value)
+        if key != "psk":
+            logging_message += f"{key}={value} "
+    logging.info(logging_message)
+
+    content_preview = activity.content[:200] if activity.content else ""
+    friendly_message = (
+        f"Activity detected: [{activity.source}] {activity.eventType} "
+        f"on {activity.url}. Content: \"{content_preview}\". "
+        f"Client: {activity.clientId}. IP: {request.client.host}"
+    )
+    logging.info(friendly_message)
+
+    try:
+        slack_alert_handler(friendly_message)
+    except Exception as error:
+        logging.error(error)
+        response.status_code = 500
+        return {"status": "Couldn't send slack alert"}
+
+    return {"status": "activity logged"}
+
 
 def friendly_timestamp(timestamp):
     datetime.fromtimestamp(timestamp / 1000).isoformat()
