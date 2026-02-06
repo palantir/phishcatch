@@ -19,7 +19,6 @@ import { handleNotificationClick } from '../lib/handleNotificationClick'
 import { initConfigListener } from '../utils/config'
 
 export default defineBackground({
-  persistent: true,
   main() {
     initConfigListener()
 

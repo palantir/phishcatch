@@ -22,16 +22,16 @@ async function updateBadge(tab: { active?: boolean; url?: string }) {
     const host = getHostFromUrl(tab.url)
 
     if ((await getDomainType(host)) === DomainType.ENTERPRISE) {
-      browser.browserAction.setBadgeText({ text: '✅' })
+      browser.action.setBadgeText({ text: '✅' })
     } else {
-      browser.browserAction.setBadgeText({ text: '' })
+      browser.action.setBadgeText({ text: '' })
     }
   }
 }
 
 export function showCheckmarkIfEnterpriseDomain() {
   try {
-    browser.browserAction.setBadgeBackgroundColor({ color: 'green' })
+    browser.action.setBadgeBackgroundColor({ color: 'green' })
     browser.tabs.onUpdated.addListener((tabID, change, tab) => {
       void updateBadge(tab)
     })

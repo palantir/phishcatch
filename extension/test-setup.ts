@@ -92,9 +92,9 @@ if (!fakeBrowser.runtime.getURL) {
   (fakeBrowser.runtime as any).getURL = (path: string) => `chrome-extension://fake-id/${path}`;
 }
 
-// Stub browserAction API
-if (!(fakeBrowser as any).browserAction) {
-  (fakeBrowser as any).browserAction = {
+// Stub action API (MV3 replacement for browserAction)
+if (!(fakeBrowser as any).action) {
+  (fakeBrowser as any).action = {
     setBadgeText: () => {},
     setBadgeBackgroundColor: () => {},
     setIcon: () => {},

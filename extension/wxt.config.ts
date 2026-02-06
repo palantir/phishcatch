@@ -2,7 +2,8 @@ import { defineConfig } from 'wxt';
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
 
 export default defineConfig({
-  manifestVersion: 2,
+  outDir: 'output',
+  manifestVersion: 3,
   manifest: {
     name: 'PhishCatch',
     description: 'Identify and prevent enterprise password leaks',
@@ -11,10 +12,11 @@ export default defineConfig({
     storage: {
       managed_schema: 'schema.json',
     },
-    externally_connectable: {},
-    content_security_policy:
-      "script-src 'self'; object-src 'self'; connect-src http://localhost:* https://*",
-    permissions: ['http://*/*', 'https://*/*', 'storage', 'notifications'],
+    content_security_policy: {
+      extension_pages: "script-src 'self'; object-src 'self'",
+    },
+    permissions: ['storage', 'notifications'],
+    host_permissions: ['http://*/*', 'https://*/*'],
   },
 
   vite: () => ({
