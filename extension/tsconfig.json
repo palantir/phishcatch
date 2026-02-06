@@ -1,16 +1,28 @@
 {
-    "compilerOptions": {
-        "module": "commonjs",
-        "target": "es6",
-        "noImplicitAny": true,
-        "strictNullChecks": true,
-        "sourceMap": false,
-        "rootDir": "src",
-        "outDir": "dist/js",
-        "noEmitOnError": true,
-        "jsx": "react",
-        "experimentalDecorators": true,
-        "forceConsistentCasingInFileNames": true,
-        "typeRoots": [ "node_modules/@types" ]
-    }
+  "compilerOptions": {
+    "module": "ESNext",
+    "target": "ESNext",
+    "moduleResolution": "bundler",
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "sourceMap": true,
+    "jsx": "react-jsx",
+    "experimentalDecorators": true,
+    "forceConsistentCasingInFileNames": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "types": ["wxt/client"]
+  },
+  "include": [
+    "entrypoints/**/*.ts",
+    "entrypoints/**/*.tsx",
+    "lib/**/*.ts",
+    "content-lib/**/*.ts",
+    "utils/**/*.ts",
+    "components/**/*.ts",
+    "components/**/*.tsx",
+    "stores/**/*.ts",
+    "__tests__/**/*.ts"
+  ],
+  "exclude": ["node_modules", ".output", ".wxt"]
 }
