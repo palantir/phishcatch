@@ -40,8 +40,8 @@ beforeAll(async () => {
   })
 })
 
-afterAll((done) => {
-  chrome.storage.local.clear(done)
+afterAll(async () => {
+  await chrome.storage.local.clear()
 })
 
 describe('We should be able to identify enterprise and ignored domains', () => {

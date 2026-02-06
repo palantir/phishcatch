@@ -37,7 +37,7 @@ export async function receiveMessage(message: PageMessage): Promise<void> {
       break
     }
     case 'username': {
-      const content = <UsernameContent>message.content
+      const content = message.content as UsernameContent
 
       if ((await getDomainType(getHostFromUrl(content.url))) === DomainType.ENTERPRISE) {
         void saveUsername(content.username)
@@ -46,14 +46,14 @@ export async function receiveMessage(message: PageMessage): Promise<void> {
       break
     }
     case 'password': {
-      const content = <PasswordContent>message.content
+      const content = message.content as PasswordContent
       if (content.password) {
         void handlePasswordEntry(content)
       }
       break
     }
     case 'domstring': {
-      const content = <DomstringContent>message.content
+      const content = message.content as DomstringContent
       void checkDOMHash(content.dom, content.url)
       break
     }

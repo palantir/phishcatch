@@ -33,19 +33,20 @@ const alertTwo: AlertContent = {
   associatedHostname: 'fefe',
 }
 
+function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
 describe('Duplicate alerts should not be sent within 30 seconds', () => {
-  it('Properly detect duplicate alerts', (callback) => {
+  it('Properly detect duplicate alerts', async () => {
     expect(checkIfDup(alertOne)).toEqual(false)
 
-    setTimeout(() => {
-      expect(checkIfDup(alertOne)).toEqual(true)
-      expect(checkIfDup(alertTwo)).toEqual(false)
-    }, 15 * 1000)
+    await delay(15 * 1000)
+    expect(checkIfDup(alertOne)).toEqual(true)
+    expect(checkIfDup(alertTwo)).toEqual(false)
 
-    setTimeout(() => {
-      expect(checkIfDup(alertOne)).toEqual(false)
-      expect(checkIfDup(alertTwo)).toEqual(true)
-      callback()
-    }, 31 * 1000)
+    await delay(16 * 1000)
+    expect(checkIfDup(alertOne)).toEqual(false)
+    expect(checkIfDup(alertTwo)).toEqual(true)
   })
 })

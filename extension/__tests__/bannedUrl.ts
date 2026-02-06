@@ -13,8 +13,8 @@ beforeAll(async () => {
     })
 })
 
-afterAll((done) => {
-    chrome.storage.local.clear(done)
+afterAll(async () => {
+  await chrome.storage.local.clear()
 })
 
 const bannedUrl = "https://www.google.com/search?q=ejfef&source=hp&ei=1dxHY4HKCsqG0PEP-c6Z0AI&iflsig=AJiK0e8AAAAAY0fq5QFfK3cBvHWekSPp8Vsr91xUnho_&ved=0ahUKEwjBiI_L9Nz6AhVKAzQIHXlnBioQ4dUDCAk&uact=5&oq=ejfef&gs_lcp=Cgdnd3Mtd2l6EAMyEAguEIAEELEDEIMBENQCEA0yEAguEIAEELEDEIMBENQCEA0yCgguEIAEELEDEA0yDQguEIAEELEDEIMBEA0yCgguEIAEELEDEA0yDQguEIAEEMcBEK8BEA0yBwgAEIAEEA0yDQguEIAEELEDENQCEA0yDQguEIAEELEDEIMBEA0yBwgAEIAEEA1QAFgAYPwDaABwAHgAgAFFiAFFkgEBMZgBAKABAqABAQ&sclient=gws-wiz"

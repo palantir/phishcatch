@@ -23,16 +23,16 @@ Object.defineProperty(global.self, 'crypto', {
   },
 })
 
-afterAll((done) => {
-  chrome.storage.local.clear(done)
+afterAll(async () => {
+  await chrome.storage.local.clear()
 })
 
 const username = 'myusername@corporate.com'
 const anotherUsername = 'other@corporate.com'
 const weirdUsername = '🐷🐮🐠🐍🐨🌑🌨☃🔥⚡@corporate.com'
 
-afterAll((done) => {
-  chrome.storage.local.clear(done)
+afterAll(async () => {
+  await chrome.storage.local.clear()
 })
 
 describe('Usernames should be saved and retrieved correctly', () => {

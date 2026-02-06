@@ -2,8 +2,8 @@ import { defineConfig } from 'wxt';
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
 
 export default defineConfig({
+  manifestVersion: 2,
   manifest: {
-    manifest_version: 2,
     name: 'PhishCatch',
     description: 'Identify and prevent enterprise password leaks',
     version: '0.16',

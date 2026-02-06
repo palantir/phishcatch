@@ -17,8 +17,8 @@ import { getPasswordHashes, getUsernames } from '../lib/userInfo'
 import { DatedDomHash, PasswordHash, Username } from '../utils/types'
 import { getSavedDomHashes } from '../lib/domhash'
 
-afterAll((done) => {
-  chrome.storage.local.clear(done)
+afterAll(async () => {
+  await chrome.storage.local.clear()
 })
 
 describe('User data should expire after the configured period of time', () => {

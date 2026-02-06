@@ -49,7 +49,7 @@ export default defineContentScript({
         config.username_selectors.forEach((selector) => {
           const usernameNode = document.querySelector(selector)
           if (usernameNode && usernameNode.nodeName === 'input') {
-            const usernameFormNode = <HTMLInputElement>usernameNode
+            const usernameFormNode = usernameNode as HTMLInputElement
             if (usernameFormNode.value && usernameFormNode.type !== 'password') {
               void saveUsername(usernameFormNode.value)
               resolve(usernameFormNode.value)
