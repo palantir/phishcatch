@@ -3,6 +3,7 @@
   "version": "0.16.0",
   "description": "Identify and prevent enterprise password leaks",
   "license": "Apache-2.0",
+  "type": "module",
   "scripts": {
     "dev": "wxt",
     "build": "wxt build",
