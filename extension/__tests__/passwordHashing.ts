@@ -15,11 +15,11 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-floating-promises */
 import * as crypto from 'crypto'
-import { handlePasswordEntry } from '../background'
+import { handlePasswordEntry } from '../lib/backgroundLogic'
 import { hashPasswordWithSalt } from '../lib/generateHash'
 import { getPasswordHashes, checkStoredHashes, hashAndSavePassword, removeHash } from '../lib/userInfo'
-import { setConfigOverride } from '../config'
-import { PasswordContent, PasswordHandlingReturnValue } from '../types'
+import { setConfigOverride } from '../utils/config'
+import { PasswordContent, PasswordHandlingReturnValue } from '../utils/types'
 import { getHashDataIfItExists, checkForExistingAccount } from '../lib/userInfo'
 import { getHostFromUrl } from '../lib/getHostFromUrl'
 

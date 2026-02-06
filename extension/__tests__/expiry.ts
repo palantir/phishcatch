@@ -14,7 +14,7 @@
 
 import { cleanupUsernamesAndPasswords, dateDiffInDays, domHashLimit, passwordHashLimit } from '../lib/timedCleanup'
 import { getPasswordHashes, getUsernames } from '../lib/userInfo'
-import { DatedDomHash, PasswordHash, Username } from '../types'
+import { DatedDomHash, PasswordHash, Username } from '../utils/types'
 import { getSavedDomHashes } from '../lib/domhash'
 
 afterAll((done) => {

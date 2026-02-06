@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import * as crypto from 'crypto'
-import { setConfigOverride } from '../config'
+import { setConfigOverride } from '../utils/config'
 import { getUsernames, hashAndSavePassword, saveUsername } from '../lib/userInfo'
 
 Object.defineProperty(global.self, 'crypto', {

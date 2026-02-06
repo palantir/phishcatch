@@ -13,10 +13,10 @@
 // limitations under the License.
 
 import * as crypto from 'crypto'
-import { setConfigOverride } from '../config'
+import { setConfigOverride } from '../utils/config'
 import { createServerAlert, getUnsentAlerts } from '../lib/sendAlert'
 import { tryToSendFailedAlerts } from '../lib/timedCleanup'
-import { AlertTypes } from '../types'
+import { AlertTypes } from '../utils/types'
 
 Object.defineProperty(global.self, 'crypto', {
   value: {

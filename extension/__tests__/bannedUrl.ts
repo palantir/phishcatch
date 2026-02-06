@@ -1,4 +1,4 @@
-import { setConfigOverride } from "../config"
+import { setConfigOverride } from "../utils/config"
 import { isBannedUrl } from "../content-lib/bannedMessage"
 
 beforeAll(async () => {

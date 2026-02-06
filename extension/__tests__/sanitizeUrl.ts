@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { setConfigOverride } from '../config'
-import { UrlSanitizationEnum } from '../types'
+import { setConfigOverride } from '../utils/config'
+import { UrlSanitizationEnum } from '../utils/types'
 import { getSanitizedUrl } from '../lib/getSanitizedUrl'
 
 const testUrl =

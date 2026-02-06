@@ -21,7 +21,7 @@ import {
   hashesMatch,
   saveDOMHash,
 } from '../lib/domhash'
-import { setConfigOverride } from '../config'
+import { setConfigOverride } from '../utils/config'
 import { getHostFromUrl } from '../lib/getHostFromUrl'
 
 const enterpriseUrl = 'http://corporate.com'
@@ -40,9 +40,9 @@ const similarTextWithUnicode = '<html>hello emoji world 🙏😄🤔👲👈😻
 const veryDifferentTextWithUnicode =
   '💤😳😇👈👩‍👩‍👧‍👦💼🎹🏸🏌🎟⚾🏀🎽🎣🎰🏩🚀🚏🚋🎆🎠 lsekfmlkewfjewflnwelfmlwemflmweflme 🏕🏚🚇🚇💵💊💊💊💊📽📽💊📼📸🔌📄📊📉📈📉📈📉📈📉📉📈📈📈📈📈📈📈📈📈📈📈📈📈📈📈📈🇮🇹🇫🇯🇲🇶🇲🇬🇭🇳🇪🇨🇳🇨🇰🇮🇬🇷 ekfmkemfemf'
 
-const authDom = fs.readFileSync('./src/__tests__/samples/authdom.txt').toString()
-const evilNginxDom = fs.readFileSync('./src/__tests__/samples/evilnginxdom.txt').toString()
-const redditDom = fs.readFileSync('./src/__tests__/samples/redditdom.txt').toString()
+const authDom = fs.readFileSync('./__tests__/samples/authdom.txt').toString()
+const evilNginxDom = fs.readFileSync('./__tests__/samples/evilnginxdom.txt').toString()
+const redditDom = fs.readFileSync('./__tests__/samples/redditdom.txt').toString()
 
 beforeAll(async () => {
   await setConfigOverride({

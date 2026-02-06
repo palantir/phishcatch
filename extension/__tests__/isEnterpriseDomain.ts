@@ -13,8 +13,8 @@
 // limitations under the License.
 
 import { getDomainType } from '../lib/getDomainType'
-import { getConfig, setConfigOverride } from '../config'
-import { DomainType } from '../types'
+import { getConfig, setConfigOverride } from '../utils/config'
+import { DomainType } from '../utils/types'
 import { getHostFromUrl } from '../lib/getHostFromUrl'
 
 const enterpriseDomain = 'corporate.com'

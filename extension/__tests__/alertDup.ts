@@ -13,9 +13,8 @@
 // limitations under the License.
 
 import { checkIfDup } from '../lib/sendAlert'
-import { AlertContent, AlertTypes } from '../types'
+import { AlertContent, AlertTypes } from '../utils/types'
 
-jest.setTimeout(60000)
 
 const alertOne: AlertContent = {
   url: 'efefef',
