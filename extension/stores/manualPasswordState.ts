@@ -13,13 +13,17 @@
 // limitations under the License.
 
 import { Intent } from '@blueprintjs/core'
-import { observable } from 'mobx'
+import { makeAutoObservable } from 'mobx'
 import { hashAndSavePassword } from '../lib/userInfo'
 import { AppToaster } from '../components/toaster'
 
 class ManualPasswordState {
-  @observable isOpen = false
-  @observable currentPassword = ''
+  isOpen = false
+  currentPassword = ''
+
+  constructor() {
+    makeAutoObservable(this)
+  }
 
   setPopupState(newStatus: boolean) {
     this.isOpen = newStatus

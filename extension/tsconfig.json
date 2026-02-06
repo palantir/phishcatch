@@ -7,7 +7,6 @@
     "strictNullChecks": true,
     "sourceMap": true,
     "jsx": "react-jsx",
-    "experimentalDecorators": true,
     "forceConsistentCasingInFileNames": true,
     "esModuleInterop": true,
     "skipLibCheck": true,

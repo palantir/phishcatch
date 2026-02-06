@@ -22,9 +22,7 @@ export default defineConfig({
 
   vite: () => ({
     plugins: [
-      // SWC handles JSX and legacy TypeScript decorators (MobX 5).
-      // esbuild silently strips legacy decorators, breaking MobX reactivity.
-      react({ tsDecorators: true }),
+      react(),
       // Chrome extensions don't support CORS on chrome-extension:// URLs.
       // Vite adds crossorigin to module scripts by default, which silently
       // prevents them from loading in the extension context.

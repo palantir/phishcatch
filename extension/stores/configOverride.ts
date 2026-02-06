@@ -12,15 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { observable } from 'mobx'
+import { makeAutoObservable } from 'mobx'
 import { AppToaster } from '../components/toaster'
 import { clearConfigOverride, getConfigOverride, setConfigOverride } from '../utils/config'
 import { Prefs } from '../utils/types'
 
 class configOverrideState {
-  @observable overrideFormText = ''
+  overrideFormText = ''
 
   constructor() {
+    makeAutoObservable(this)
     void this.loadConfigOverride()
   }
 

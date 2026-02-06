@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import { browser } from 'wxt/browser'
-import { observable } from 'mobx'
+import { makeAutoObservable } from 'mobx'
 import { getHashesAsTlshInstances } from '../lib/domhash'
 import { getUnsentAlerts } from '../lib/sendAlert'
 import { getPasswordHashes, getUsernames } from '../lib/userInfo'
@@ -22,15 +22,16 @@ import { Prefs } from '../utils/types'
 import { AppToaster } from '../components/toaster'
 
 class StorageState {
-  @observable showDebug = false
-  @observable configReady = false
-  @observable config: Prefs
-  @observable usernameList: string[] = []
-  @observable passwordHashList: string[] = []
-  @observable domHashList: string[] = []
-  @observable numberOfUnsentAlerts = 0
+  showDebug = false
+  configReady = false
+  config: Prefs
+  usernameList: string[] = []
+  passwordHashList: string[] = []
+  domHashList: string[] = []
+  numberOfUnsentAlerts = 0
 
   constructor() {
+    makeAutoObservable(this)
     void this.loadConfig()
   }
 

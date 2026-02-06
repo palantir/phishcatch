@@ -23,8 +23,7 @@ function makeLi(thing: string) {
   return <li key={thing}>{thing}</li>
 }
 
-@observer
-export class Debug extends React.Component {
+class DebugComponent extends React.Component {
   render() {
     const usernames = popupStore.usernameList.map(makeLi)
     const passwords = popupStore.passwordHashList.map(makeLi)
@@ -71,3 +70,5 @@ export class Debug extends React.Component {
     )
   }
 }
+
+export const Debug = observer(DebugComponent)

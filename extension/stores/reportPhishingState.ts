@@ -14,14 +14,18 @@
 
 import { browser } from 'wxt/browser'
 import { Intent } from '@blueprintjs/core'
-import { observable } from 'mobx'
+import { makeAutoObservable } from 'mobx'
 import { getSanitizedUrl } from '../lib/getSanitizedUrl'
 import { createServerAlert } from '../lib/sendAlert'
 import { AlertTypes } from '../utils/types'
 import { AppToaster } from '../components/toaster'
 
 class ReportPhishingState {
-  @observable isOpen = false
+  isOpen = false
+
+  constructor() {
+    makeAutoObservable(this)
+  }
 
   setPopupState(newStatus: boolean) {
     this.isOpen = newStatus

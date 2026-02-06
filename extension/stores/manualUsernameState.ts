@@ -13,13 +13,17 @@
 // limitations under the License.
 
 import { Intent } from '@blueprintjs/core'
-import { observable } from 'mobx'
+import { makeAutoObservable } from 'mobx'
 import { saveUsername } from '../lib/userInfo'
 import { AppToaster } from '../components/toaster'
 
 class ManualUsernameState {
-  @observable isOpen = false
-  @observable currentUsername = ''
+  isOpen = false
+  currentUsername = ''
+
+  constructor() {
+    makeAutoObservable(this)
+  }
 
   setPopupState(newStatus: boolean) {
     this.isOpen = newStatus

@@ -18,8 +18,7 @@ import * as React from 'react'
 import { configOverrideStore } from '../stores/configOverride'
 import { popupStore } from '../stores/popupState'
 
-@observer
-export class ConfigOverrideForm extends React.Component {
+class ConfigOverrideFormComponent extends React.Component {
   // eslint-disable-next-line @typescript-eslint/ban-types
   constructor(props: {} | Readonly<{}>) {
     super(props)
@@ -69,3 +68,5 @@ export class ConfigOverrideForm extends React.Component {
     )
   }
 }
+
+export const ConfigOverrideForm = observer(ConfigOverrideFormComponent)

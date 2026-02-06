@@ -20,8 +20,7 @@ import { popupStore } from '../stores/popupState'
 import { Debug } from './debug'
 import { Home } from './home'
 
-@observer
-export class App extends React.Component {
+class AppComponent extends React.Component {
   faqLink() {
     const faqLink = popupStore.config.faq_link
     if (faqLink) {
@@ -95,3 +94,5 @@ export class App extends React.Component {
     )
   }
 }
+
+export const App = observer(AppComponent)
