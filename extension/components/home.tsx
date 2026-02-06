@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { browser } from 'wxt/browser'
 import * as React from 'react'
 import { Button, Card, Tooltip } from '@blueprintjs/core'
 import { popupStore } from '../stores/popupState'
@@ -75,7 +76,7 @@ export function Home() {
           intent="danger"
           onClick={() => {
             // eslint-disable-next-line @typescript-eslint/no-misused-promises
-            chrome.storage.local.clear(async () => {
+            browser.storage.local.clear(async () => {
               await popupStore.clearStorage()
               await popupStore.loadConfig()
             })

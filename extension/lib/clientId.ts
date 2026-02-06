@@ -1,3 +1,4 @@
+// Copyright 2021 Palantir Technologies
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { browser } from 'wxt/browser'
 import { getSalt } from './generateHash'
 
 export function generateId() {
@@ -19,7 +21,7 @@ export function generateId() {
 
 export async function saveId(id: string) {
   return new Promise((resolve, reject) => {
-    chrome.storage.local.set({ clientId: id }, () => {
+    browser.storage.local.set({ clientId: id }, () => {
       resolve(true)
     })
   })
@@ -27,7 +29,7 @@ export async function saveId(id: string) {
 
 export function getId(): Promise<string> {
   return new Promise((resolve, reject) => {
-    chrome.storage.local.get('clientId', (data) => {
+    browser.storage.local.get('clientId', (data) => {
       if (!data.clientId) {
         const newId = generateId()
         void saveId(newId)

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { browser } from 'wxt/browser'
 import { Alignment, Button, Navbar } from '@blueprintjs/core'
 import { observer } from 'mobx-react'
 import * as React from 'react'
@@ -30,7 +31,7 @@ export class App extends React.Component {
           icon="help"
           text="FAQ"
           onClick={() => {
-            chrome.tabs.create({ url: faqLink })
+            browser.tabs.create({ url: faqLink })
           }}
         />
       )
@@ -46,7 +47,7 @@ export class App extends React.Component {
           icon="git-repo"
           text="Source Code"
           onClick={() => {
-            chrome.tabs.create({ url: repoLink })
+            browser.tabs.create({ url: repoLink })
           }}
         />
       )

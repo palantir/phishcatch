@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { browser } from 'wxt/browser'
 import { DomainType } from '../utils/types'
 import { getHostFromUrl } from './getHostFromUrl'
 import { getDomainType } from './getDomainType'
@@ -21,21 +22,21 @@ async function updateBadge(tab: chrome.tabs.Tab) {
     const host = getHostFromUrl(tab.url)
 
     if ((await getDomainType(host)) === DomainType.ENTERPRISE) {
-      chrome.browserAction.setBadgeText({ text: '✅' })
+      browser.browserAction.setBadgeText({ text: '✅' })
     } else {
-      chrome.browserAction.setBadgeText({ text: '' })
+      browser.browserAction.setBadgeText({ text: '' })
     }
   }
 }
 
 export function showCheckmarkIfEnterpriseDomain() {
   try {
-    chrome.browserAction.setBadgeBackgroundColor({ color: 'green' })
-    chrome.tabs.onUpdated.addListener((tabID, change, tab) => {
+    browser.browserAction.setBadgeBackgroundColor({ color: 'green' })
+    browser.tabs.onUpdated.addListener((tabID, change, tab) => {
       void updateBadge(tab)
     })
-    chrome.tabs.onActivated.addListener((activeInfo) => {
-      chrome.tabs.get(activeInfo.tabId, (tab) => {
+    browser.tabs.onActivated.addListener((activeInfo) => {
+      browser.tabs.get(activeInfo.tabId, (tab) => {
         void updateBadge(tab)
       })
     })

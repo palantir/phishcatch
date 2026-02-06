@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { browser } from 'wxt/browser'
 import { Intent } from '@blueprintjs/core'
 import { observable } from 'mobx'
 import { getSanitizedUrl } from '../lib/getSanitizedUrl'
@@ -28,7 +29,7 @@ class ReportPhishingState {
 
   createReport() {
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    chrome.tabs.query({ active: true, lastFocusedWindow: true }, async (tabs) => {
+    browser.tabs.query({ active: true, lastFocusedWindow: true }, async (tabs) => {
       const tab = tabs[0]
       if (tab && tab.url) {
         const url = await getSanitizedUrl(tab.url)

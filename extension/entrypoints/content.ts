@@ -16,7 +16,7 @@ import { debounce } from '../content-lib/debounce'
 import { getSanitizedUrl } from '../lib/getSanitizedUrl'
 import { getDomainType } from '../lib/getDomainType'
 import { DomainType, PasswordContent, UsernameContent } from '../utils/types'
-import { getConfig } from '../utils/config'
+import { getConfig, initConfigListener } from '../utils/config'
 import { isBannedUrl, setBannedMessage } from '../content-lib/bannedMessage'
 
 export default defineContentScript({
@@ -24,6 +24,7 @@ export default defineContentScript({
   allFrames: true,
   runAt: 'document_idle',
   main() {
+    initConfigListener()
     function runMSUsernameScraper() {
       if (window.location.hostname === 'login.microsoftonline.com') {
         const displayNameNode = document.getElementById('displayName')
@@ -78,7 +79,7 @@ export default defineContentScript({
         referrer: await getSanitizedUrl(document.referrer),
         timestamp: new Date().getTime(),
       }
-      chrome.runtime.sendMessage({
+      browser.runtime.sendMessage({
         msgtype: 'password',
         content,
       })
@@ -95,7 +96,7 @@ export default defineContentScript({
         url: await getSanitizedUrl(location.href),
         dom: document.getElementsByTagName('body')[0].innerHTML,
       }
-      chrome.runtime.sendMessage({
+      browser.runtime.sendMessage({
         msgtype: 'username',
         content,
       })
@@ -129,7 +130,7 @@ export default defineContentScript({
     }
 
     async function checkDomHash() {
-      chrome.runtime.sendMessage({
+      browser.runtime.sendMessage({
         msgtype: 'domstring',
         content: {
           dom: document.getElementsByTagName('body')[0].innerHTML,

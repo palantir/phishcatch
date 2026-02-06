@@ -16,13 +16,16 @@ import { receiveMessage } from '../lib/backgroundLogic'
 import { showCheckmarkIfEnterpriseDomain } from '../lib/showCheckmarkIfEnterpriseDomain'
 import { timedCleanup } from '../lib/timedCleanup'
 import { handleNotificationClick } from '../lib/handleNotificationClick'
+import { initConfigListener } from '../utils/config'
 
 export default defineBackground({
   persistent: true,
   main() {
+    initConfigListener()
+
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    chrome.runtime.onMessage.addListener(receiveMessage)
-    chrome.notifications.onButtonClicked.addListener(handleNotificationClick)
+    browser.runtime.onMessage.addListener(receiveMessage)
+    browser.notifications.onButtonClicked.addListener(handleNotificationClick)
 
     void showCheckmarkIfEnterpriseDomain()
     timedCleanup()

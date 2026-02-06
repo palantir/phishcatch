@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { browser } from 'wxt/browser'
 import { AlertTypes, NotificationData } from '../utils/types'
 import { removeHash } from './userInfo'
 import { createServerAlert } from './sendAlert'
@@ -26,7 +27,7 @@ export function addNotitication(data: NotificationData) {
 export function handleNotificationClick(notifId: string, btnId: number) {
   const notificationData = notificationStorage.get(notifId)
   if (notificationData) {
-    const alertIconUrl = chrome.runtime.getURL('icon.png')
+    const alertIconUrl = browser.runtime.getURL('icon.png')
     if (btnId === 0) {
       const opt: chrome.notifications.NotificationOptions = {
         type: 'basic',
@@ -36,7 +37,7 @@ export function handleNotificationClick(notifId: string, btnId: number) {
         priority: 2,
       }
 
-      chrome.notifications.create(opt)
+      browser.notifications.create(opt)
 
       void createServerAlert({
         referrer: '',
@@ -53,7 +54,7 @@ export function handleNotificationClick(notifId: string, btnId: number) {
         priority: 2,
       }
 
-      chrome.notifications.create(opt)
+      browser.notifications.create(opt)
 
       void createServerAlert({
         referrer: '',

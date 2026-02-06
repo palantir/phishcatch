@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { browser } from 'wxt/browser'
 import { observable } from 'mobx'
 import { getHashesAsTlshInstances } from '../lib/domhash'
 import { getUnsentAlerts } from '../lib/sendAlert'
@@ -52,7 +53,7 @@ class StorageState {
 
   async clearStorage() {
     return new Promise((resolve) => {
-      chrome.storage.local.clear(() => {
+      browser.storage.local.clear(() => {
         AppToaster.show({ message: 'Cleared local storage!', intent: 'success' })
         resolve(true)
       })

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { browser } from 'wxt/browser'
 import TlshConstructor from './tlsh'
 import { getConfig } from '../utils/config'
 import { DomainType, TLSHInstance, DatedDomHash, AlertTypes } from '../utils/types'
@@ -45,7 +46,7 @@ export async function alertUser(host: string) {
 
   if (config.display_reuse_alerts) {
     // Iconurl: https://www.flaticon.com/free-icon/hacker_1995788?term=phish&page=1&position=49
-    const alertIconUrl = chrome.runtime.getURL('icon.png')
+    const alertIconUrl = browser.runtime.getURL('icon.png')
     const opt = {
       type: 'basic',
       title: 'PhishCatch Alert',
@@ -53,7 +54,7 @@ export async function alertUser(host: string) {
       iconUrl: alertIconUrl,
     }
 
-    chrome.notifications.create(opt)
+    browser.notifications.create(opt)
   }
 }
 
@@ -101,7 +102,7 @@ export async function saveDOMHash(dom: string, url: string) {
     } else {
       savedDatedHashes.push({ hash: currentHash, dateAdded: new Date().getTime(), source: getHostFromUrl(url) })
 
-      chrome.storage.local.set({ datedDomHashes: savedDatedHashes }, () => {
+      browser.storage.local.set({ datedDomHashes: savedDatedHashes }, () => {
         resolve(true)
       })
     }
@@ -110,10 +111,10 @@ export async function saveDOMHash(dom: string, url: string) {
 
 export async function getSavedDomHashes(): Promise<DatedDomHash[]> {
   return new Promise((resolve) => {
-    chrome.storage.local.get('datedDomHashes', (data: { datedDomHashes: DatedDomHash[] | undefined }) => {
+    browser.storage.local.get('datedDomHashes', (data: { datedDomHashes: DatedDomHash[] | undefined }) => {
       const hashes: DatedDomHash[] = data.datedDomHashes || []
       if (!data.datedDomHashes) {
-        chrome.storage.local.set({ datedDomHashes: hashes }, () => {
+        browser.storage.local.set({ datedDomHashes: hashes }, () => {
           resolve(hashes)
         })
       } else {

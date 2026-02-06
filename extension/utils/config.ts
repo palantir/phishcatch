@@ -14,6 +14,7 @@
 
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import { browser } from 'wxt/browser'
 import { Prefs, UrlSanitizationEnum } from './types'
 import { dateDiffInDays } from '../lib/timedCleanup'
 
@@ -43,18 +44,23 @@ const defaults: Prefs = {
 }
 
 let configCache: configCache | false = false
+let listenerRegistered = false
 
-chrome.storage.onChanged.addListener((changes, areaName) => {
-  if (areaName === 'managed') {
-    clearCache()
-  }
-})
+export function initConfigListener() {
+  if (listenerRegistered) return
+  listenerRegistered = true
+  browser.storage.onChanged.addListener((changes, areaName) => {
+    if (areaName === 'managed') {
+      clearCache()
+    }
+  })
+}
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export async function setConfigOverride(newConfig: Object) {
   return new Promise((resolve, reject) => {
     try {
-      chrome.storage.local.set({ configOverride: newConfig }, () => {
+      browser.storage.local.set({ configOverride: newConfig }, () => {
         clearCache()
         resolve(true)
       })
@@ -66,7 +72,7 @@ export async function setConfigOverride(newConfig: Object) {
 
 export async function clearConfigOverride() {
   return new Promise((resolve) => {
-    chrome.storage.local.set({ configOverride: false }, () => {
+    browser.storage.local.set({ configOverride: false }, () => {
       resolve(true)
     })
   })
@@ -74,7 +80,7 @@ export async function clearConfigOverride() {
 
 export async function getConfigOverride(): Promise<Prefs | false> {
   return new Promise((resolve) => {
-    chrome.storage.local.get('configOverride', (data) => {
+    browser.storage.local.get('configOverride', (data) => {
       if (data.configOverride) {
         const prefs = { ...defaults }
 
@@ -96,7 +102,7 @@ async function getManagedPreferences(): Promise<Prefs> {
   const prefs = { ...defaults }
 
   return new Promise((resolve) => {
-    chrome.storage.managed.get(Object.keys(prefs), (storedPrefs: Prefs) => {
+    browser.storage.managed.get(Object.keys(prefs), (storedPrefs: Prefs) => {
       Object.keys(storedPrefs).forEach((key) => {
         const value = (storedPrefs as any)[key]
         if (value || value === false) {

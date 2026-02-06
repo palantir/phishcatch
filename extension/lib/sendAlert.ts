@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { browser } from 'wxt/browser'
 import { getConfig } from '../utils/config'
 import { AlertContent, AlertTypes } from '../utils/types'
 import { getUsernames } from './userInfo'
@@ -36,7 +37,7 @@ interface UnsentAlert {
 
 export async function getUnsentAlerts(): Promise<UnsentAlert[]> {
   return new Promise((resolve) => {
-    chrome.storage.local.get('unsentAlerts', (data) => {
+    browser.storage.local.get('unsentAlerts', (data) => {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const unsentAlerts: UnsentAlert[] = data.unsentAlerts || []
       resolve(unsentAlerts)
@@ -63,7 +64,7 @@ export async function saveUnsentAlert(newUnsentAlert: UnsentAlert) {
   }
 
   return new Promise((resolve) => {
-    chrome.storage.local.set({ unsentAlerts }, () => {
+    browser.storage.local.set({ unsentAlerts }, () => {
       resolve(true)
     })
   })

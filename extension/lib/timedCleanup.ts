@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { browser } from 'wxt/browser'
 import { getConfig } from '../utils/config'
 import { getUsernames, getPasswordHashes } from './userInfo'
 import { getUnsentAlerts, sendAlert } from './sendAlert'
@@ -67,7 +68,7 @@ export async function cleanupUsernamesAndPasswords() {
   const datedDomHashes = await cleanData(await getSavedDomHashes(), domHashLimit)
 
   return new Promise((resolve) => {
-    chrome.storage.local.set(
+    browser.storage.local.set(
       {
         usernames,
         passwordHashes,
@@ -104,7 +105,7 @@ export async function tryToSendFailedAlerts() {
     )
   ).filter(notEmpty)
 
-  chrome.storage.local.set({ unsentAlerts })
+  browser.storage.local.set({ unsentAlerts })
 
   return unsentAlerts
 }

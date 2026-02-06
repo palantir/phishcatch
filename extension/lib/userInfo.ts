@@ -12,13 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { browser } from 'wxt/browser'
 import { getConfig } from '../utils/config'
 import { PasswordHash, Username } from '../utils/types'
 import { generateSaltAndHashPassword, hashPasswordWithSalt } from './generateHash'
 
 export async function getUsernames(): Promise<Username[]> {
   return new Promise((resolve) => {
-    chrome.storage.local.get('usernames', (data) => {
+    browser.storage.local.get('usernames', (data) => {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const usernames: Username[] = data.usernames || []
       resolve(usernames)
@@ -74,7 +75,7 @@ export async function saveUsername(username: string): Promise<boolean> {
   }
 
   return new Promise((resolve) => {
-    chrome.storage.local.set({ usernames: currentUsernames }, () => {
+    browser.storage.local.set({ usernames: currentUsernames }, () => {
       resolve(true)
     })
   })
@@ -83,7 +84,7 @@ export async function saveUsername(username: string): Promise<boolean> {
 // TODO: Cache password hashes
 export async function getPasswordHashes(): Promise<PasswordHash[]> {
   return new Promise((resolve) => {
-    chrome.storage.local.get('passwordHashes', (data) => {
+    browser.storage.local.get('passwordHashes', (data) => {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const hashes: PasswordHash[] = data.passwordHashes || []
       resolve(hashes)
@@ -124,7 +125,7 @@ export async function removeHash(hashToRemove: string) {
   })
 
   return new Promise((resolve) => {
-    chrome.storage.local.set({ passwordHashes: currentHashes }, () => {
+    browser.storage.local.set({ passwordHashes: currentHashes }, () => {
       resolve(true)
     })
   })
@@ -193,7 +194,7 @@ export async function hashAndSavePassword(password: string, username?: string, h
   }
 
   return new Promise((resolve) => {
-    chrome.storage.local.set({ passwordHashes: currentHashes }, () => {
+    browser.storage.local.set({ passwordHashes: currentHashes }, () => {
       resolve(true)
     })
   })
