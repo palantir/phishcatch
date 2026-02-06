@@ -35,19 +35,23 @@ class StorageState {
   }
 
   async loadConfig() {
-    this.config = await getConfig()
-    const passwordHashList = (await getPasswordHashes()).map((hash) => {
-      return JSON.stringify({ ...hash, hash: hash.hash.substring(0, 15) + '...' }, null, 2)
-    })
+    try {
+      this.config = await getConfig()
+      const passwordHashList = (await getPasswordHashes()).map((hash) => {
+        return JSON.stringify({ ...hash, hash: hash.hash.substring(0, 15) + '...' }, null, 2)
+      })
 
-    const domHashList: string[] = (await getHashesAsTlshInstances()).map((instance) => {
-      return instance.hash().substring(0, 15) + '...'
-    })
+      const domHashList: string[] = (await getHashesAsTlshInstances()).map((instance) => {
+        return instance.hash().substring(0, 15) + '...'
+      })
 
-    this.usernameList = (await getUsernames()).map((username) => username.username)
-    this.passwordHashList = passwordHashList
-    this.domHashList = domHashList
-    this.numberOfUnsentAlerts = (await getUnsentAlerts()).length
+      this.usernameList = (await getUsernames()).map((username) => username.username)
+      this.passwordHashList = passwordHashList
+      this.domHashList = domHashList
+      this.numberOfUnsentAlerts = (await getUnsentAlerts()).length
+    } catch (e) {
+      console.error('PhishCatch: failed to load popup config', e)
+    }
     this.configReady = true
   }
 

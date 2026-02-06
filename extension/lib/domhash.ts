@@ -124,7 +124,7 @@ export async function getHashesAsTlshInstances(): Promise<TLSHInstance[]> {
 
 export async function checkDOMHash(dom: string, url: string) {
   if (!dom) {
-    throw 'No dom'
+    return false
   }
   const host = getHostFromUrl(url)
 

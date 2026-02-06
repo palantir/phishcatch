@@ -19,4 +19,11 @@ import '../../assets/blueprint-icons.css'
 import '../../assets/blueprint.css'
 import { App } from '../../components/app'
 
-ReactDOM.render(<App />, document.getElementById('root'))
+console.log('PhishCatch: popup script loaded')
+const root = document.getElementById('root')
+if (root) {
+  ReactDOM.render(<App />, root)
+  console.log('PhishCatch: React rendered')
+} else {
+  console.error('PhishCatch: #root element not found')
+}

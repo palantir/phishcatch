@@ -88,13 +88,18 @@ export async function getConfigOverride(): Promise<Prefs | false> {
 async function getManagedPreferences(): Promise<Prefs> {
   const prefs = { ...defaults }
 
-  const storedPrefs = await browser.storage.managed.get(Object.keys(prefs)) as unknown as Prefs
-  Object.keys(storedPrefs).forEach((key) => {
-    const value = (storedPrefs as any)[key]
-    if (value || value === false) {
-      ;(prefs as any)[key] = value
-    }
-  })
+  try {
+    const storedPrefs = await browser.storage.managed.get(Object.keys(prefs)) as unknown as Prefs
+    Object.keys(storedPrefs).forEach((key) => {
+      const value = (storedPrefs as any)[key]
+      if (value || value === false) {
+        ;(prefs as any)[key] = value
+      }
+    })
+  } catch {
+    // Managed storage throws when no enterprise policy is configured.
+    // Fall back to defaults.
+  }
 
   return prefs
 }

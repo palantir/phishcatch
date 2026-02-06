@@ -75,7 +75,7 @@ export class App extends React.Component {
     }
 
     if (!popupStore.configReady) {
-      return <div />
+      return <div style={{ width: '50em', padding: '1em' }}>Loading...</div>
     }
 
     return (
