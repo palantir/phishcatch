@@ -46,15 +46,15 @@ export async function alertUser(host: string) {
 
   if (config.display_reuse_alerts) {
     // Iconurl: https://www.flaticon.com/free-icon/hacker_1995788?term=phish&page=1&position=49
-    const alertIconUrl = browser.runtime.getURL('icon.png')
-    const opt = {
+    const alertIconUrl = chrome.runtime.getURL('icon.png')
+    const opt: chrome.notifications.NotificationOptions = {
       type: 'basic',
       title: 'PhishCatch Alert',
       message: `PhishCatch has detected a likely phishing page at: ${host}\n`,
       iconUrl: alertIconUrl,
     }
 
-    browser.notifications.create(opt)
+    browser.notifications.create(opt as any)
   }
 }
 
@@ -106,7 +106,7 @@ export async function saveDOMHash(dom: string, url: string) {
 }
 
 export async function getSavedDomHashes(): Promise<DatedDomHash[]> {
-  const data = await browser.storage.local.get('datedDomHashes') as { datedDomHashes: DatedDomHash[] | undefined }
+  const data = await browser.storage.local.get('datedDomHashes') as { datedDomHashes?: DatedDomHash[] }
   const hashes: DatedDomHash[] = data.datedDomHashes || []
   if (!data.datedDomHashes) {
     await browser.storage.local.set({ datedDomHashes: hashes })

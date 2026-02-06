@@ -17,7 +17,7 @@ import { DomainType } from '../utils/types'
 import { getHostFromUrl } from './getHostFromUrl'
 import { getDomainType } from './getDomainType'
 
-async function updateBadge(tab: chrome.tabs.Tab) {
+async function updateBadge(tab: { active?: boolean; url?: string }) {
   if (tab.active && tab.url) {
     const host = getHostFromUrl(tab.url)
 

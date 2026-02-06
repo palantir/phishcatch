@@ -27,7 +27,7 @@ export function addNotitication(data: NotificationData) {
 export function handleNotificationClick(notifId: string, btnId: number) {
   const notificationData = notificationStorage.get(notifId)
   if (notificationData) {
-    const alertIconUrl = browser.runtime.getURL('icon.png')
+    const alertIconUrl = chrome.runtime.getURL('icon.png')
     if (btnId === 0) {
       const opt: chrome.notifications.NotificationOptions = {
         type: 'basic',
@@ -37,7 +37,7 @@ export function handleNotificationClick(notifId: string, btnId: number) {
         priority: 2,
       }
 
-      browser.notifications.create(opt)
+      browser.notifications.create(opt as any)
 
       void createServerAlert({
         referrer: '',
@@ -54,7 +54,7 @@ export function handleNotificationClick(notifId: string, btnId: number) {
         priority: 2,
       }
 
-      browser.notifications.create(opt)
+      browser.notifications.create(opt as any)
 
       void createServerAlert({
         referrer: '',

@@ -11,8 +11,9 @@
     "forceConsistentCasingInFileNames": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "types": ["wxt/client"]
+    "types": ["vitest/globals", "chrome"]
   },
+  "files": [".wxt/wxt.d.ts"],
   "include": [
     "entrypoints/**/*.ts",
     "entrypoints/**/*.tsx",
@@ -24,5 +25,5 @@
     "stores/**/*.ts",
     "__tests__/**/*.ts"
   ],
-  "exclude": ["node_modules", ".output", ".wxt"]
+  "exclude": ["node_modules", ".output"]
 }

@@ -36,8 +36,7 @@ interface UnsentAlert {
 }
 
 export async function getUnsentAlerts(): Promise<UnsentAlert[]> {
-  const data = await browser.storage.local.get('unsentAlerts')
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const data = await browser.storage.local.get('unsentAlerts') as { unsentAlerts?: UnsentAlert[] }
   const unsentAlerts: UnsentAlert[] = data.unsentAlerts || []
   return unsentAlerts
 }

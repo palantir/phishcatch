@@ -25,12 +25,12 @@ export async function saveId(id: string) {
 }
 
 export async function getId(): Promise<string> {
-  const data = await browser.storage.local.get('clientId')
+  const data = await browser.storage.local.get('clientId') as { clientId?: string }
   if (!data.clientId) {
     const newId = generateId()
     void saveId(newId)
     return newId
   } else {
-    return data.clientId as string
+    return data.clientId
   }
 }

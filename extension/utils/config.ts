@@ -69,12 +69,12 @@ export async function clearConfigOverride() {
 }
 
 export async function getConfigOverride(): Promise<Prefs | false> {
-  const data = await browser.storage.local.get('configOverride')
+  const data = await browser.storage.local.get('configOverride') as { configOverride?: Record<string, any> }
   if (data.configOverride) {
     const prefs = { ...defaults }
 
     Object.keys(data.configOverride).forEach((key) => {
-      const value = data.configOverride[key]
+      const value = data.configOverride![key]
       if (value || value === false) {
         ;(prefs as any)[key] = value
       }
@@ -88,7 +88,7 @@ export async function getConfigOverride(): Promise<Prefs | false> {
 async function getManagedPreferences(): Promise<Prefs> {
   const prefs = { ...defaults }
 
-  const storedPrefs = await browser.storage.managed.get(Object.keys(prefs)) as Prefs
+  const storedPrefs = await browser.storage.managed.get(Object.keys(prefs)) as unknown as Prefs
   Object.keys(storedPrefs).forEach((key) => {
     const value = (storedPrefs as any)[key]
     if (value || value === false) {

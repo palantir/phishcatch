@@ -18,8 +18,7 @@ import { PasswordHash, Username } from '../utils/types'
 import { generateSaltAndHashPassword, hashPasswordWithSalt } from './generateHash'
 
 export async function getUsernames(): Promise<Username[]> {
-  const data = await browser.storage.local.get('usernames')
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const data = await browser.storage.local.get('usernames') as { usernames?: Username[] }
   const usernames: Username[] = data.usernames || []
   return usernames
 }
@@ -77,8 +76,7 @@ export async function saveUsername(username: string): Promise<boolean> {
 
 // TODO: Cache password hashes
 export async function getPasswordHashes(): Promise<PasswordHash[]> {
-  const data = await browser.storage.local.get('passwordHashes')
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const data = await browser.storage.local.get('passwordHashes') as { passwordHashes?: PasswordHash[] }
   const hashes: PasswordHash[] = data.passwordHashes || []
   return hashes
 }

@@ -215,7 +215,7 @@ describe('Hash saving/checking should work', () => {
   it('Storage should not contain plaintext passwords', async () => {
     const hashArray = [passwordOne, passwordTwo, emojiPassword]
 
-    const data = await chrome.storage.local.get(null)
+    const data = await chrome.storage.local.get(null as any)
     const hashStorageString = JSON.stringify(data)
 
     const hashStorageContainsPassword = hashArray.reduce((previousValue, currentValue) => {

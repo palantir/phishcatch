@@ -98,7 +98,7 @@ async function handlePasswordLeak(message: PasswordContent, hashData: PasswordHa
 
   if (config.display_reuse_alerts) {
     // Iconurl: https://www.flaticon.com/free-icon/hacker_1995788?term=phish&page=1&position=49
-    const alertIconUrl = browser.runtime.getURL('icon.png')
+    const alertIconUrl = chrome.runtime.getURL('icon.png')
     const opt: chrome.notifications.NotificationOptions = {
       type: 'basic',
       title: 'PhishCatch Alert',
@@ -109,7 +109,7 @@ async function handlePasswordLeak(message: PasswordContent, hashData: PasswordHa
       buttons: [{ title: 'This is a false positive' }, { title: `That wasn't my enterprise password` }],
     }
 
-    const id = await browser.notifications.create(opt)
+    const id = await browser.notifications.create(opt as any)
     addNotitication({ id, hash: hashData.hash, url: message.url })
   }
 
