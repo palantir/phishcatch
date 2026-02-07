@@ -1,7 +1,5 @@
 # PhishCatch: Webpack to WXT Migration Plan
 
-> Generated with [Claude Code](https://claude.com/claude-code) - February 2026
-
 ## Scope
 Migrate the `extension/` build system from Webpack 5 to WXT (Vite-based), migrate tests from Jest to Vitest, and restructure the project to follow WXT conventions. Stay on Manifest V2 to keep this focused on the build system.
 

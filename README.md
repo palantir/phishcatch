@@ -10,7 +10,7 @@ Originally built by [Palantir Technologies](https://github.com/palantir/phishcat
 
 **Phishing page detection** — fingerprints enterprise login page DOM structures with TLSH fuzzy hashing and flags suspicious clones on other domains.
 
-**Activity monitoring** — captures user interactions with monitored web applications (ChatGPT, etc.) and logs them to the backend. The extension ships a generic interception engine; the backend supplies monitoring rules. No extension update is needed to add or modify monitored apps.
+**Activity monitoring** — captures user interactions with monitored web applications (ChatGPT, etc.) and logs them to the backend. The extension ships a generic interception engine; the backend supplies monitoring rules. Rules are managed at runtime through a built-in web dashboard — no code changes or restarts needed to add or modify monitored apps.
 
 **Centralized alerting** — all detections and activity are sent to a FastAPI backend with syslog and Slack integration.
 
@@ -25,8 +25,9 @@ Extension (Chrome MV3)                    Backend (FastAPI)
 │                                │        │ POST /activity         │
 │ Service Worker                 │        │ GET /status            │
 │  - Message routing             │◄──────►│                        │
-│  - Rule caching                │        │ Slack webhook          │
-│  - Hash management             │        │ Syslog                 │
+│  - Rule caching                │        │ CRUD /api/rules        │
+│  - Hash management             │        │ Slack webhook          │
+│                                │        │ Syslog                 │
 └────────────────────────────────┘        └────────────────────────┘
 ```
 
@@ -64,6 +65,45 @@ Set the extension's config override (or deploy via Chrome managed policy):
 - `enterprise_domains` — domains where corporate passwords are entered
 
 See `extension/public/schema.json` for all configuration options and `policy-templates/` for enterprise deployment templates.
+
+## How It Works (TLDR)
+
+1. The **backend** serves monitoring rules that describe what to watch — which domains, what network requests to intercept, and how to extract content.
+2. The **extension** fetches these rules on startup, injects content scripts into matching domains, and uses the specified strategy (e.g., `fetch_intercept`) to capture user activity.
+3. Captured activity is posted back to the backend, which logs it, pushes it to the live dashboard via SSE, and optionally forwards it to Slack.
+4. For password reuse, the extension hashes passwords client-side and compares hashes across sites — passwords never leave the browser in plaintext.
+
+Rules are stored in `rules.json` next to the backend and can be managed through the web dashboard or the REST API without restarting the server. Extensions pick up changes on their next rule refresh.
+
+## Rules Dashboard
+
+The rules dashboard lets you add, edit, and delete monitoring rules at runtime. Start the backend and open:
+
+```
+http://localhost:8000/rules/dashboard
+```
+
+From here you can:
+- View all active monitoring rules with their domains and URL patterns
+- Create new rules by clicking **+ New Rule** and filling in the form
+- Edit existing rules (source, domains, strategy, fetchConfig)
+- Delete rules with a confirmation prompt
+
+Changes take effect immediately — they're persisted to `rules.json` and returned by `GET /monitoring-rules` on the next extension refresh.
+
+A tab bar links between the **Activity** dashboard (live event stream) and the **Rules** dashboard.
+
+### Rules API
+
+The dashboard is backed by a REST API you can also call directly:
+
+| Endpoint | Method | Description |
+|---|---|---|
+| `/api/rules` | GET | List all rules |
+| `/api/rules` | POST | Create a new rule |
+| `/api/rules/{id}` | PUT | Update an existing rule |
+| `/api/rules/{id}` | DELETE | Delete a rule |
+| `/monitoring-rules` | GET | Same list, consumed by the extension |
 
 ## Tech Stack
 
