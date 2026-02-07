@@ -31,13 +31,8 @@ export default defineContentScript({
       const fetchRules = matchingRules.filter((r) => r.strategy === 'fetch_intercept')
       if (fetchRules.length === 0) return
 
-      // Inject the MAIN world fetch interceptor
-      const script = document.createElement('script')
-      script.src = browser.runtime.getURL('/activity-interceptor.js' as any)
-      script.onload = () => script.remove()
-      document.documentElement.appendChild(script)
-
-      // Configure the interceptor with matching rules
+      // Configure the MAIN world interceptor (activity-interceptor.content.ts)
+      // which Chrome injects separately as a world: 'MAIN' content script.
       window.postMessage(
         {
           type: 'PHISHCATCH_CONFIGURE',

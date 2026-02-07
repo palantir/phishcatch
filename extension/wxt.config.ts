@@ -18,12 +18,6 @@ export default defineConfig({
     },
     permissions: ['storage', 'notifications'],
     host_permissions: ['http://*/*', 'https://*/*'],
-    web_accessible_resources: [
-      {
-        resources: ['activity-interceptor.js'],
-        matches: ['<all_urls>'],
-      },
-    ],
   },
 
   vite: () => ({

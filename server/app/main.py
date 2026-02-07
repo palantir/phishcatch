@@ -18,9 +18,12 @@ import uuid
 import random
 import string
 import logging
+import asyncio
 import configparser
 from typing import Optional
+from collections import deque
 from fastapi import FastAPI, Response, Request, status
+from fastapi.responses import HTMLResponse, StreamingResponse
 from mangum import Mangum
 from pydantic import BaseModel
 from datetime import datetime
@@ -28,6 +31,10 @@ import requests
 
 app = FastAPI()
 web_handler = Mangum(app)
+
+# In-memory activity log for the live dashboard
+activity_log: deque = deque(maxlen=100)
+activity_subscribers: list = []
 
 preshared_key = os.environ.get('PRESHARED_KEY')
 if preshared_key is None:
@@ -71,7 +78,22 @@ MONITORING_RULES = [
             "urlPattern": "/backend-api/conversation",
             "method": "POST",
             "extractPath": ["messages", -1, "content", "parts"],
-            "filterPath": ["messages", -1, "role"],
+            "filterPath": ["messages", -1, "author", "role"],
+            "filterValue": "user",
+            "join": "\n"
+        }
+    },
+    {
+        "id": "chatgpt-anon",
+        "source": "chatgpt",
+        "domains": ["chatgpt.com", "chat.openai.com"],
+        "strategy": "fetch_intercept",
+        "eventType": "user_input",
+        "fetchConfig": {
+            "urlPattern": "/backend-anon/f/conversation",
+            "method": "POST",
+            "extractPath": ["messages", -1, "content", "parts"],
+            "filterPath": ["messages", -1, "author", "role"],
             "filterValue": "user",
             "join": "\n"
         }
@@ -107,11 +129,11 @@ def alert(alert: AlertModel, request: Request, response: Response):
 
     logging_message = f"src_ip={request.client.host} "
 
-    for key in alert:
-        if (key[0] == "alertTimestamp"):
-            key = (key[0], friendly_timestamp(key[1]))
-        if (key[0] != "psk"):
-            logging_message += f"{key[0]}={key[1]} "
+    for key, value in alert:
+        if key == "alertTimestamp":
+            value = friendly_timestamp(value)
+        if key != "psk":
+            logging_message += f"{key}={value} "
 
     logging.info(logging_message)
 
@@ -129,7 +151,7 @@ def alert(alert: AlertModel, request: Request, response: Response):
         logging.error("Invalid alert type")
         friendly_message = f"A user with associated usernames {alert.allAssociatedUsernames} fired an unknown alert on {alert.alertUrl}! Referrer: {alert.referrer}. Is the server up to date?"
 
-    if alert.suspectedUsername is not 'null' and alert.suspectedUsername is not 'null':
+    if alert.suspectedUsername != 'null' and alert.suspectedHost != 'null':
         friendly_message += f" Suspected account for this leak: {alert.suspectedUsername} from {alert.suspectedHost}."
     friendly_message += f" Referrer: {alert.referrer}. Timestamp: {alert.alertTimestamp}. Client ID: {alert.clientId}."
     friendly_message += f" Request IP: {request.client.host}"
@@ -189,6 +211,20 @@ def log_activity(activity: ActivityModel, request: Request, response: Response):
     )
     logging.info(friendly_message)
 
+    # Push to live dashboard
+    event_data = {
+        "source": activity.source,
+        "eventType": activity.eventType,
+        "content": activity.content,
+        "url": activity.url,
+        "timestamp": activity.timestamp,
+        "clientId": activity.clientId,
+        "ip": request.client.host,
+    }
+    activity_log.append(event_data)
+    for queue in activity_subscribers:
+        queue.put_nowait(event_data)
+
     try:
         slack_alert_handler(friendly_message)
     except Exception as error:
@@ -197,6 +233,101 @@ def log_activity(activity: ActivityModel, request: Request, response: Response):
         return {"status": "Couldn't send slack alert"}
 
     return {"status": "activity logged"}
+
+
+###############################################################################
+# Live activity dashboard. Open in a browser to watch activity events
+# arrive in real-time via Server-Sent Events.
+#
+# http://localhost:8000/activity/dashboard
+#
+###############################################################################
+@app.get("/activity/stream")
+async def activity_stream():
+    queue = asyncio.Queue()
+    activity_subscribers.append(queue)
+
+    async def event_generator():
+        try:
+            while True:
+                event = await queue.get()
+                yield f"data: {json.dumps(event)}\n\n"
+        except asyncio.CancelledError:
+            pass
+        finally:
+            activity_subscribers.remove(queue)
+
+    return StreamingResponse(event_generator(), media_type="text/event-stream")
+
+@app.get("/activity/dashboard", response_class=HTMLResponse)
+async def activity_dashboard():
+    recent = list(activity_log)
+    return f"""<!DOCTYPE html>
+<html>
+<head>
+  <title>PhishCatch Activity Monitor</title>
+  <style>
+    * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+    body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0d1117; color: #c9d1d9; padding: 24px; }}
+    h1 {{ color: #58a6ff; margin-bottom: 8px; font-size: 24px; }}
+    .subtitle {{ color: #8b949e; margin-bottom: 24px; font-size: 14px; }}
+    .status {{ display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #3fb950; margin-right: 8px; animation: pulse 2s infinite; }}
+    @keyframes pulse {{ 0%, 100% {{ opacity: 1; }} 50% {{ opacity: 0.4; }} }}
+    #events {{ display: flex; flex-direction: column; gap: 8px; }}
+    .event {{ background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 16px; animation: fadeIn 0.3s ease; }}
+    .event.new {{ border-left: 3px solid #58a6ff; }}
+    @keyframes fadeIn {{ from {{ opacity: 0; transform: translateY(-8px); }} to {{ opacity: 1; transform: translateY(0); }} }}
+    .event-header {{ display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 12px; color: #8b949e; }}
+    .event-source {{ background: #1f6feb; color: white; padding: 2px 8px; border-radius: 12px; font-weight: 600; font-size: 11px; text-transform: uppercase; }}
+    .event-content {{ font-family: 'SF Mono', Menlo, monospace; font-size: 14px; color: #f0f6fc; white-space: pre-wrap; word-break: break-word; }}
+    .event-url {{ font-size: 12px; color: #8b949e; margin-top: 8px; }}
+    .empty {{ color: #8b949e; text-align: center; padding: 48px; font-style: italic; }}
+  </style>
+</head>
+<body>
+  <h1><span class="status"></span>PhishCatch Activity Monitor</h1>
+  <p class="subtitle">Watching for user activity on monitored applications</p>
+  <div id="events">
+    <div class="empty" id="empty-msg">Waiting for activity events...</div>
+  </div>
+  <script>
+    const eventsDiv = document.getElementById('events');
+    const emptyMsg = document.getElementById('empty-msg');
+    const recent = {json.dumps(recent)};
+
+    function formatTime(ts) {{
+      return new Date(ts).toLocaleTimeString('en-US', {{ hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' }});
+    }}
+
+    function addEvent(data, isNew) {{
+      if (emptyMsg) emptyMsg.remove();
+      const div = document.createElement('div');
+      div.className = 'event' + (isNew ? ' new' : '');
+      div.innerHTML =
+        '<div class="event-header">' +
+          '<span class="event-source">' + data.source + '</span>' +
+          '<span>' + formatTime(data.timestamp) + '</span>' +
+        '</div>' +
+        '<div class="event-content">' + escapeHtml(data.content) + '</div>' +
+        '<div class="event-url">' + escapeHtml(data.url) + ' &middot; ' + data.eventType + '</div>';
+      eventsDiv.insertBefore(div, eventsDiv.firstChild);
+    }}
+
+    function escapeHtml(s) {{
+      const d = document.createElement('div');
+      d.textContent = s;
+      return d.innerHTML;
+    }}
+
+    recent.forEach(e => addEvent(e, false));
+
+    const es = new EventSource('/activity/stream');
+    es.onmessage = function(e) {{
+      addEvent(JSON.parse(e.data), true);
+    }};
+  </script>
+</body>
+</html>"""
 
 
 def friendly_timestamp(timestamp):
