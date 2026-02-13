@@ -16,12 +16,12 @@ import { getConfig } from '../config'
 import { getUsernames, getPasswordHashes } from './userInfo'
 import { getUnsentAlerts, sendAlert } from './sendAlert'
 import { getSavedDomHashes } from './domhash'
-
-const hourValue = 1000 * 60 * 60
-const dayValue = hourValue * 24
+import { dayValue, hourValue, dayInMinutes } from '../types'
 
 export const passwordHashLimit = 20
 export const domHashLimit = 50
+const cleanUpPasswordAlarmName = 'cleanupUsernamesAndPasswords'
+const tryToSendFailedAlertsAlarmName = 'tryToSendFailedAlerts'
 
 export function dateDiffInDays(date1: number, date2: number) {
   const diffInMs = date2 - date1
@@ -109,13 +109,31 @@ export async function tryToSendFailedAlerts() {
   return unsentAlerts
 }
 
+function handleAlarm(alarm: chrome.alarms.Alarm) {
+  if (alarm.name === cleanUpPasswordAlarmName) {
+    cleanupUsernamesAndPasswords()
+    return
+  }
+  if (alarm.name === tryToSendFailedAlertsAlarmName) {
+    tryToSendFailedAlerts()
+    return
+  }
+}
+
+async function createDailyAlarm(alarmName: string) {
+  const alarm = await chrome.alarms.get(alarmName)
+  if (typeof alarm === 'undefined') {
+    await chrome.alarms.create(alarmName, {
+      periodInMinutes: dayInMinutes,
+    })
+  }
+}
+
 export function timedCleanup() {
   void tryToSendFailedAlerts()
   void cleanupUsernamesAndPasswords()
 
-  // eslint-disable-next-line @typescript-eslint/no-misused-promises
-  setInterval(cleanupUsernamesAndPasswords, hourValue)
-
-  // eslint-disable-next-line @typescript-eslint/no-misused-promises
-  setInterval(tryToSendFailedAlerts, hourValue)
+  chrome.alarms.onAlarm.addListener(handleAlarm)
+  createDailyAlarm(cleanUpPasswordAlarmName)
+  createDailyAlarm(tryToSendFailedAlertsAlarmName)
 }

@@ -16,6 +16,7 @@ import { getConfig } from '../config'
 import { AlertContent, AlertTypes } from '../types'
 import { getUsernames } from './userInfo'
 import { getId } from './clientId'
+import { dayValue } from '../types'
 
 interface Alert {
   allAssociatedUsernames: string
@@ -157,8 +158,8 @@ export function checkIfDup(message: AlertContent) {
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 let recentAlerts: Map<string, Date> = new Map()
 
-// TODO - use alarm, avoid use of magic number
+// TODO - use alarm
 setTimeout(() => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   recentAlerts = new Map()
-}, 24 * 60 * 60 * 1000)
+}, dayValue)

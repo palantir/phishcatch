@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+export const hourValue = 1000 * 60 * 60
+export const dayValue = hourValue * 24
+export const dayInMinutes = 1440
+
 export interface Prefs {
   data_expiry: number
   display_reuse_alerts: boolean
