@@ -20,7 +20,6 @@ export async function getUsernames(): Promise<Username[]> {
   const data = (await chrome.storage.local.get('usernames')) as {
     usernames?: Username[]
   }
-
   return data.usernames || []
 }
 

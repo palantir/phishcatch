@@ -15,7 +15,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-floating-promises */
 import * as crypto from 'crypto'
-import { handlePasswordEntry } from '../background'
 import { hashPasswordWithSalt } from '../lib/generateHash'
 import { getPasswordHashes, checkStoredHashes, hashAndSavePassword, removeHash } from '../lib/userInfo'
 import { setConfigOverride } from '../config'
@@ -28,6 +27,21 @@ Object.defineProperty(global.self, 'crypto', {
     getRandomValues: (arr: any) => crypto.randomBytes(arr.length),
   },
 })
+
+// Ensure chrome.alarms exists before import the background.ts module
+global.chrome = global.chrome || ({} as typeof chrome)
+global.chrome.alarms = global.chrome.alarms || {
+  create: jest.fn(),
+  clear: jest.fn(),
+  getAll: jest.fn().mockResolvedValue([]),
+  get: jest.fn().mockResolvedValue([]),
+  onAlarm: {
+    addListener: jest.fn(),
+    removeListener: jest.fn(),
+  },
+}
+
+import { handlePasswordEntry } from '../background'
 
 const salt = '0000000000000000000000000000000000'
 const passwordOne = 'passwordOne'

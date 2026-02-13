@@ -84,7 +84,7 @@ describe('Usernames should be saved and retrieved correctly', () => {
       ignored_domains: [],
       pbkdf2_iterations: 100000,
       // eslint-disable-next-line prettier/prettier
-      username_regexes: ['^[a-z0-9](\.?[a-z0-9]){5,}@corporate.com$'],
+      username_regexes: ['^[a-z0-9](.?[a-z0-9]){5,}@corporate.com$'],
     })
 
     const password = 'anotherpassword'
