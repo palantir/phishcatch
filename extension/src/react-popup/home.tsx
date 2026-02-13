@@ -73,12 +73,11 @@ export function Home() {
 
         <Button
           intent="danger"
-          onClick={() => {
+          onClick={async () => {
             // eslint-disable-next-line @typescript-eslint/no-misused-promises
-            chrome.storage.local.clear(async () => {
-              await popupStore.clearStorage()
-              await popupStore.loadConfig()
-            })
+            await chrome.storage.local.clear()
+            await popupStore.clearStorage()
+            await popupStore.loadConfig()
           }}
           icon={'trash'}
         >

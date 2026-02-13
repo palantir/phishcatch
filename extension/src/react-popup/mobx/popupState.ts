@@ -51,12 +51,8 @@ class StorageState {
   }
 
   async clearStorage() {
-    return new Promise((resolve) => {
-      chrome.storage.local.clear(() => {
-        AppToaster.show({ message: 'Cleared local storage!', intent: 'success' })
-        resolve(true)
-      })
-    })
+    await chrome.storage.local.clear()
+    AppToaster.show({ message: 'Cleared local storage!', intent: 'success' })
   }
 }
 

@@ -26,9 +26,9 @@ class ReportPhishingState {
     this.isOpen = newStatus
   }
 
-  createReport() {
+  async createReport() {
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    chrome.tabs.query({ active: true, lastFocusedWindow: true }, async (tabs) => {
+    const tabs = await chrome.tabs.query({ active: true, lastFocusedWindow: true })
       const tab = tabs[0]
       if (tab && tab.url) {
         const url = await getSanitizedUrl(tab.url)
@@ -48,7 +48,6 @@ class ReportPhishingState {
       }
 
       this.isOpen = false
-    })
   }
 }
 
