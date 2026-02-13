@@ -13,7 +13,7 @@
 // limitations under the License.
 
 const path = require('path')
-const webpack = require('webpack');
+const webpack = require('webpack')
 const CopyPlugin = require('copy-webpack-plugin')
 const srcDir = '../src/'
 
@@ -30,8 +30,12 @@ module.exports = {
   },
   optimization: {
     splitChunks: {
-      name: 'vendor',
-      chunks: 'initial',
+      cacheGroups: {
+        vendor: {
+          name: 'vendor',
+          chunks: (chunk) => chunk.name !== 'background',
+        },
+      },
     },
   },
   module: {
@@ -46,9 +50,9 @@ module.exports = {
   resolve: {
     extensions: ['.ts', '.tsx', '.js'],
     fallback: {
-      "buffer": require.resolve('buffer/'),
-      'util': require.resolve('util/')
-    }
+      buffer: require.resolve('buffer/'),
+      util: require.resolve('util/'),
+    },
   },
   plugins: [
     new webpack.ProvidePlugin({
