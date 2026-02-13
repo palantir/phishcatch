@@ -52,62 +52,51 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export async function setConfigOverride(newConfig: Object) {
-  return new Promise((resolve, reject) => {
-    try {
-      chrome.storage.local.set({ configOverride: newConfig }, () => {
-        clearCache()
-        resolve(true)
-      })
-    } catch (e) {
-      reject()
-    }
-  })
+  try {
+    await chrome.storage.local.set({ configOverride: newConfig })
+    clearCache()
+    return true
+  } catch (e) {
+    return e
+  }
 }
 
 export async function clearConfigOverride() {
-  return new Promise((resolve) => {
-    chrome.storage.local.set({ configOverride: false }, () => {
-      resolve(true)
-    })
-  })
+  await chrome.storage.local.set({ configOverride: false })
+  return true
 }
 
 export async function getConfigOverride(): Promise<Prefs | false> {
-  return new Promise((resolve) => {
-    chrome.storage.local.get('configOverride', (data) => {
-      if (data.configOverride) {
-        const prefs = { ...defaults }
-        const configOverride = data.configOverride as any
+  const data = (await chrome.storage.local.get('configOverride')) as { configOverride?: Prefs }
+  if (data.configOverride) {
+    const prefs = { ...defaults }
+    const configOverride = data.configOverride as any
 
-        Object.keys(configOverride).forEach((key) => {
-          const value = configOverride[key]
-          if (value || value === false) {
-            ;(prefs as any)[key] = value
-          }
-        })
-        resolve(prefs)
-      } else {
-        resolve(false)
+    Object.keys(configOverride).forEach((key) => {
+      const value = configOverride[key]
+      if (value || value === false) {
+        ;(prefs as any)[key] = value
       }
     })
-  })
+    return prefs
+  }
+
+  return false
 }
 
 async function getManagedPreferences(): Promise<Prefs> {
   const prefs = { ...defaults }
 
-  return new Promise((resolve) => {
-    chrome.storage.managed.get(Object.keys(prefs) as (keyof Prefs)[], (storedPrefs: Prefs) => {
-      Object.keys(storedPrefs).forEach((key) => {
-        const value = (storedPrefs as any)[key]
-        if (value || value === false) {
-          ;(prefs as any)[key] = value
-        }
-      })
+  const storedPrefs = (await chrome.storage.managed.get(Object.keys(prefs) as (keyof Prefs)[])) as Prefs
 
-      resolve(prefs)
-    })
+  Object.keys(storedPrefs).forEach((key) => {
+    const value = (storedPrefs as any)[key]
+    if (value || value === false) {
+      ;(prefs as any)[key] = value
+    }
   })
+
+  return prefs
 }
 
 export function clearCache() {
