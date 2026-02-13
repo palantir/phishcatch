@@ -21,23 +21,22 @@ async function updateBadge(tab: chrome.tabs.Tab) {
     const host = getHostFromUrl(tab.url)
 
     if ((await getDomainType(host)) === DomainType.ENTERPRISE) {
-      chrome.browserAction.setBadgeText({ text: '✅' })
+      chrome.action.setBadgeText({ text: '✅' })
     } else {
-      chrome.browserAction.setBadgeText({ text: '' })
+      chrome.action.setBadgeText({ text: '' })
     }
   }
 }
 
 export function showCheckmarkIfEnterpriseDomain() {
   try {
-    chrome.browserAction.setBadgeBackgroundColor({ color: 'green' })
+    chrome.action.setBadgeBackgroundColor({ color: 'green' })
     chrome.tabs.onUpdated.addListener((tabID, change, tab) => {
       void updateBadge(tab)
     })
-    chrome.tabs.onActivated.addListener((activeInfo) => {
-      chrome.tabs.get(activeInfo.tabId, (tab) => {
-        void updateBadge(tab)
-      })
+    chrome.tabs.onActivated.addListener(async (activeInfo) => {
+      const tab = await chrome.tabs.get(activeInfo.tabId)
+      void updateBadge(tab)
     })
   } catch (e) {
     // https://github.com/clarkbw/jest-webextension-mock/pull/127

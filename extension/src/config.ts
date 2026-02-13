@@ -77,9 +77,10 @@ export async function getConfigOverride(): Promise<Prefs | false> {
     chrome.storage.local.get('configOverride', (data) => {
       if (data.configOverride) {
         const prefs = { ...defaults }
+        const configOverride = data.configOverride as any
 
-        Object.keys(data.configOverride).forEach((key) => {
-          const value = data.configOverride[key]
+        Object.keys(configOverride).forEach((key) => {
+          const value = configOverride[key]
           if (value || value === false) {
             ;(prefs as any)[key] = value
           }
@@ -96,7 +97,7 @@ async function getManagedPreferences(): Promise<Prefs> {
   const prefs = { ...defaults }
 
   return new Promise((resolve) => {
-    chrome.storage.managed.get(Object.keys(prefs), (storedPrefs: Prefs) => {
+    chrome.storage.managed.get(Object.keys(prefs) as (keyof Prefs)[], (storedPrefs: Prefs) => {
       Object.keys(storedPrefs).forEach((key) => {
         const value = (storedPrefs as any)[key]
         if (value || value === false) {

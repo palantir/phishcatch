@@ -13,28 +13,25 @@
 
 import { getSalt } from './generateHash'
 
+interface ClientIdStorage {
+  clientId: string | null
+}
+
 export function generateId() {
   return getSalt()
 }
 
 export async function saveId(id: string) {
-  return new Promise((resolve, reject) => {
-    chrome.storage.local.set({ clientId: id }, () => {
-      resolve(true)
-    })
-  })
+  const payload: ClientIdStorage = { clientId: id }
+  return await chrome.storage.local.set(payload)
 }
 
-export function getId(): Promise<string> {
-  return new Promise((resolve, reject) => {
-    chrome.storage.local.get('clientId', (data) => {
-      if (!data.clientId) {
-        const newId = generateId()
-        void saveId(newId)
-        resolve(newId)
-      } else {
-        resolve(data.clientId)
-      }
-    })
-  })
+export async function getId(): Promise<string> {
+  const data = (await chrome.storage.local.get('clientId')) as ClientIdStorage
+  if (!data.clientId) {
+    const newId = generateId()
+    await saveId(newId)
+    return newId
+  }
+  return data.clientId
 }

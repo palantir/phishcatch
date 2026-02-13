@@ -17,13 +17,11 @@ import { PasswordHash, Username } from '../types'
 import { generateSaltAndHashPassword, hashPasswordWithSalt } from './generateHash'
 
 export async function getUsernames(): Promise<Username[]> {
-  return new Promise((resolve) => {
-    chrome.storage.local.get('usernames', (data) => {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const usernames: Username[] = data.usernames || []
-      resolve(usernames)
-    })
-  })
+  const data = (await chrome.storage.local.get('usernames')) as {
+    usernames?: Username[]
+  }
+
+  return data.usernames || []
 }
 
 export async function saveUsername(username: string): Promise<boolean> {
@@ -73,22 +71,17 @@ export async function saveUsername(username: string): Promise<boolean> {
     currentUsernames.push(newUserName)
   }
 
-  return new Promise((resolve) => {
-    chrome.storage.local.set({ usernames: currentUsernames }, () => {
-      resolve(true)
-    })
-  })
+  await chrome.storage.local.set({ usernames: currentUsernames })
+  return true
 }
 
 // TODO: Cache password hashes
 export async function getPasswordHashes(): Promise<PasswordHash[]> {
-  return new Promise((resolve) => {
-    chrome.storage.local.get('passwordHashes', (data) => {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const hashes: PasswordHash[] = data.passwordHashes || []
-      resolve(hashes)
-    })
-  })
+  const data = (await chrome.storage.local.get('passwordHashes')) as {
+    passwordHashes?: PasswordHash[]
+  }
+
+  return data.passwordHashes || []
 }
 
 export async function checkStoredHashes(password: string) {
@@ -123,11 +116,8 @@ export async function removeHash(hashToRemove: string) {
     return hash.hash !== hashToRemove
   })
 
-  return new Promise((resolve) => {
-    chrome.storage.local.set({ passwordHashes: currentHashes }, () => {
-      resolve(true)
-    })
-  })
+  await chrome.storage.local.set({ passwordHashes: currentHashes })
+  return true
 }
 
 function sanitizeHash(hash: PasswordHash) {
@@ -192,9 +182,6 @@ export async function hashAndSavePassword(password: string, username?: string, h
     }
   }
 
-  return new Promise((resolve) => {
-    chrome.storage.local.set({ passwordHashes: currentHashes }, () => {
-      resolve(true)
-    })
-  })
+  await chrome.storage.local.set({ passwordHashes: currentHashes })
+  return true
 }

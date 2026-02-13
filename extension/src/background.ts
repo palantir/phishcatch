@@ -23,7 +23,12 @@ import {
   AlertTypes,
   PasswordHash,
 } from './types'
-import { hashAndSavePassword as hashAndSavePassword, saveUsername, getHashDataIfItExists, removeHash } from './lib/userInfo'
+import {
+  hashAndSavePassword as hashAndSavePassword,
+  saveUsername,
+  getHashDataIfItExists,
+  removeHash,
+} from './lib/userInfo'
 import { checkDOMHash, saveDOMHash } from './lib/domhash'
 import { showCheckmarkIfEnterpriseDomain } from './lib/showCheckmarkIfEnterpriseDomain'
 import { createServerAlert } from './lib/sendAlert'
@@ -100,7 +105,7 @@ async function handlePasswordLeak(message: PasswordContent, hashData: PasswordHa
   if (config.display_reuse_alerts) {
     // Iconurl: https://www.flaticon.com/free-icon/hacker_1995788?term=phish&page=1&position=49
     const alertIconUrl = chrome.runtime.getURL('icon.png')
-    const opt: chrome.notifications.NotificationOptions = {
+    const opt: chrome.notifications.NotificationCreateOptions = {
       type: 'basic',
       title: 'PhishCatch Alert',
       message: `PhishCatch has detected enterprise password re-use on the url: ${message.url}\n`,
@@ -110,9 +115,8 @@ async function handlePasswordLeak(message: PasswordContent, hashData: PasswordHa
       buttons: [{ title: 'This is a false positive' }, { title: `That wasn't my enterprise password` }],
     }
 
-    chrome.notifications.create(opt, (id) => {
-      addNotitication({ id, hash: hashData.hash, url: message.url })
-    })
+    const id = await chrome.notifications.create(opt)
+    addNotitication({ id, hash: hashData.hash, url: message.url })
   }
 
   if (config.expire_hash_on_use) {

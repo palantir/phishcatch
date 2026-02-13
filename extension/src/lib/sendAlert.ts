@@ -35,13 +35,11 @@ interface UnsentAlert {
 }
 
 export async function getUnsentAlerts(): Promise<UnsentAlert[]> {
-  return new Promise((resolve) => {
-    chrome.storage.local.get('unsentAlerts', (data) => {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const unsentAlerts: UnsentAlert[] = data.unsentAlerts || []
-      resolve(unsentAlerts)
-    })
-  })
+  const data = (await chrome.storage.local.get('unsentAlerts')) as {
+    unsentAlerts?: UnsentAlert[]
+  }
+
+  return data.unsentAlerts || []
 }
 
 export async function saveUnsentAlert(newUnsentAlert: UnsentAlert) {
@@ -62,11 +60,8 @@ export async function saveUnsentAlert(newUnsentAlert: UnsentAlert) {
     unsentAlerts.push(newUnsentAlert)
   }
 
-  return new Promise((resolve) => {
-    chrome.storage.local.set({ unsentAlerts }, () => {
-      resolve(true)
-    })
-  })
+  await chrome.storage.local.set({ unsentAlerts })
+  return true
 }
 
 export async function sendAlert(alert: Alert) {
@@ -162,6 +157,7 @@ export function checkIfDup(message: AlertContent) {
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 let recentAlerts: Map<string, Date> = new Map()
 
+// TODO - use alarm, avoid use of magic number
 setTimeout(() => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   recentAlerts = new Map()
