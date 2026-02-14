@@ -29,25 +29,25 @@ class ReportPhishingState {
   async createReport() {
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     const tabs = await chrome.tabs.query({ active: true, lastFocusedWindow: true })
-      const tab = tabs[0]
-      if (tab && tab.url) {
-        const url = await getSanitizedUrl(tab.url)
-        const sentAlert = await createServerAlert({
-          url,
-          referrer: '',
-          timestamp: new Date().getTime(),
-          alertType: AlertTypes.USERREPORT,
-        })
-        if (sentAlert) {
-          AppToaster.show({ message: `Reported ${url}!`, intent: Intent.SUCCESS })
-        } else {
-          AppToaster.show({ message: `No server configured - reach out to infosec`, intent: Intent.WARNING })
-        }
+    const tab = tabs[0]
+    if (tab && tab.url) {
+      const url = await getSanitizedUrl(tab.url)
+      const sentAlert = await createServerAlert({
+        url,
+        referrer: '',
+        timestamp: new Date().getTime(),
+        alertType: AlertTypes.USERREPORT,
+      })
+      if (sentAlert) {
+        AppToaster.show({ message: `Reported ${url}!`, intent: Intent.SUCCESS })
       } else {
-        AppToaster.show({ message: "Couldn't get current URL!", intent: Intent.DANGER })
+        AppToaster.show({ message: `No server configured - reach out to infosec`, intent: Intent.WARNING })
       }
+    } else {
+      AppToaster.show({ message: "Couldn't get current URL!", intent: Intent.DANGER })
+    }
 
-      this.isOpen = false
+    this.isOpen = false
   }
 }
 

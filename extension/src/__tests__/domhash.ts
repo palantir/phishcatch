@@ -148,12 +148,12 @@ describe('Hash saving/checking should work', () => {
     getSavedDomHashes().then((domHashes) => {
       const datedDomHash = domHashes[0]
       const originalDate = datedDomHash.dateAdded
-  
+
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
       setTimeout(async () => {
         await saveDOMHash(baseText, enterpriseUrl)
         domHashes = await getSavedDomHashes()
-  
+
         expect(domHashes[0].dateAdded).toBeGreaterThan(originalDate)
         callback()
       }, 10)
