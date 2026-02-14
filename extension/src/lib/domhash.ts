@@ -14,6 +14,7 @@
 
 import TlshConstructor from './tlsh'
 import { getConfig } from '../config'
+import { logErrorMessage } from './logToConsole'
 import { DomainType, TLSHInstance, DatedDomHash, AlertTypes } from '../types'
 import { getDomainType } from './getDomainType'
 import { createServerAlert } from './sendAlert'
@@ -76,7 +77,7 @@ export async function saveDOMHash(dom: string, url: string) {
   const instance = getTlshInstance(dom)
   const currentHash = instance.hash()
   if (forbiddenHashes.has(currentHash)) {
-    console.error('hit a forbidden hash, not saving', currentHash)
+    logErrorMessage('hit a forbidden hash, not saving', currentHash)
     throw new Error('Forbidden hash!')
   }
 
@@ -93,18 +94,13 @@ export async function saveDOMHash(dom: string, url: string) {
     return hashesMatch(storedInstance, instance)
   })
 
-  return new Promise((resolve) => {
-    if (existingHashIndex !== -1) {
-      savedDatedHashes[existingHashIndex].dateAdded = new Date().getTime()
-      resolve(true)
-    } else {
-      savedDatedHashes.push({ hash: currentHash, dateAdded: new Date().getTime(), source: getHostFromUrl(url) })
-
-      chrome.storage.local.set({ datedDomHashes: savedDatedHashes }, () => {
-        resolve(true)
-      })
-    }
-  })
+  if (existingHashIndex !== -1) {
+    savedDatedHashes[existingHashIndex].dateAdded = new Date().getTime()
+  } else {
+    savedDatedHashes.push({ hash: currentHash, dateAdded: new Date().getTime(), source: getHostFromUrl(url) })
+    await chrome.storage.local.set({ datedDomHashes: savedDatedHashes })
+  }
+  return true
 }
 
 export async function getSavedDomHashes(): Promise<DatedDomHash[]> {

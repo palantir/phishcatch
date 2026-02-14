@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import { getConfig } from '../config'
+import { logInformationMessage, logErrorMessage } from './logToConsole'
 import { AlertContent, AlertTypes } from '../types'
 import { getUsernames } from './userInfo'
 import { getId } from './clientId'
@@ -68,7 +69,7 @@ export async function saveUnsentAlert(newUnsentAlert: UnsentAlert) {
 export async function sendAlert(alert: Alert) {
   const config = await getConfig()
   const url_alert = `${config.phishcatch_server}/alert`
-
+  logInformationMessage('Sending alert to server', alert)
   try {
     const response = await fetch(url_alert, {
       method: 'POST',
@@ -77,13 +78,15 @@ export async function sendAlert(alert: Alert) {
       },
       body: JSON.stringify(alert),
     })
-
+    logInformationMessage('Response status from server', response.status)
     if (response.status === 200) {
       return true
     } else {
       return false
     }
   } catch (error) {
+    logErrorMessage('Error sending server alert')
+    logErrorMessage(error)
     return false
   }
 }
@@ -92,10 +95,12 @@ export async function createServerAlert(message: AlertContent) {
   const config = await getConfig()
 
   if (!config.phishcatch_server) {
+    logInformationMessage('No Phishcatch Server configured')
     return false
   }
 
   if (checkIfDup(message)) {
+    logInformationMessage('Duplicate server message, not sending')
     return false
   }
 

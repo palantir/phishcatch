@@ -26,6 +26,7 @@ const defaults: Prefs = {
   data_expiry: 30,
   display_reuse_alerts: true,
   enable_debug_gui: true,
+  enable_debug_logging: true,
   enterprise_domains: [],
   expire_hash_on_use: true,
   faq_link: null,

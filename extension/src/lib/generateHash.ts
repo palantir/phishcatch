@@ -58,5 +58,5 @@ export async function generateSaltAndHashPassword(key: string): Promise<Contextl
 }
 
 export function getSalt(): string {
-  return byteToHex(window.crypto.getRandomValues(new Uint8Array(16)))
+  return byteToHex(self.crypto.getRandomValues(new Uint8Array(16)))
 }

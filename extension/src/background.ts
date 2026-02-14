@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import { getConfig } from './config'
+import { logInformationMessage } from './lib/logToConsole'
 import {
   PageMessage,
   UsernameContent,
@@ -38,6 +39,7 @@ import { timedCleanup } from './lib/timedCleanup'
 import { addNotitication, handleNotificationClick } from './lib/handleNotificationClick'
 
 export async function receiveMessage(message: PageMessage): Promise<void> {
+  logInformationMessage('message received in SW', message)
   switch (message.msgtype) {
     case 'debug': {
       break
@@ -92,7 +94,10 @@ export async function handlePasswordEntry(message: PasswordContent) {
 }
 
 async function handlePasswordLeak(message: PasswordContent, hashData: PasswordHash) {
+  logInformationMessage('Handling Password Leak')
+
   const config = await getConfig()
+
   const alertContent = {
     ...message,
     alertType: AlertTypes.REUSE,

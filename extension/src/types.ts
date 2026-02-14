@@ -20,6 +20,7 @@ export interface Prefs {
   data_expiry: number
   display_reuse_alerts: boolean
   enable_debug_gui: boolean
+  enable_debug_logging: boolean
   enterprise_domains: string[]
   expire_hash_on_use: boolean
   faq_link: string | null

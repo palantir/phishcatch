@@ -23,7 +23,7 @@ const debounce = (func: Function, delay: number): Function => {
     const context = this
     const args = arguments
     clearTimeout(inDebounce)
-    inDebounce = window.setTimeout(() => func.apply(context, args), delay)
+    inDebounce = self.setTimeout(() => func.apply(context, args), delay)
   }
 }
 

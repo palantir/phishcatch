@@ -19,7 +19,6 @@ import { getDomainType } from './getDomainType'
 async function updateBadge(tab: chrome.tabs.Tab) {
   if (tab.active && tab.url) {
     const host = getHostFromUrl(tab.url)
-
     if ((await getDomainType(host)) === DomainType.ENTERPRISE) {
       chrome.action.setBadgeText({ text: '✅' })
     } else {

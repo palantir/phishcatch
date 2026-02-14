@@ -17,6 +17,7 @@ import { getSanitizedUrl } from './lib/getSanitizedUrl'
 import { getDomainType } from './lib/getDomainType'
 import { DomainType, PasswordContent, UsernameContent } from './types'
 import { getConfig } from './config'
+import { logInformationMessage } from './lib/logToConsole'
 import { isBannedUrl, setBannedMessage } from './content-lib/bannedMessage'
 
 // wait for page to load before doing anything
@@ -133,10 +134,15 @@ function inputChangedTrigger(event: Event) {
 }
 
 async function checkDomHash() {
+  const hasBodyHtml = typeof document !== 'undefined' && !!document.body && document.body.innerHTML.trim().length > 0
+  if (!hasBodyHtml) {
+    logInformationMessage('No Body to check')
+    return
+  }
   chrome.runtime.sendMessage({
     msgtype: 'domstring',
     content: {
-      dom: document.getElementsByTagName('body')[0].innerHTML,
+      dom: document.body.innerHTML,
       url: await getSanitizedUrl(location.href),
     },
   })
