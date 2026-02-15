@@ -53,7 +53,7 @@ class AlertModel(BaseModel):
 # Status endpoint. Used to test connection
 #
 # curl -X GET http://localhost:8000/status
-#    
+#
 ###############################################################################
 @app.get("/status")
 def health_check():
@@ -68,7 +68,7 @@ def health_check():
 @app.post("/alert")
 def alert(alert: AlertModel, request: Request, response: Response):
     logging.info("Received a credential reuse alert!")
-    
+
     if (preshared_key):
         if (alert.psk != preshared_key):
             logging.info("Alert did not include correct pre-shared key! Correct key: {preshared_key}. Provided key: {alert.psk}")
@@ -93,6 +93,8 @@ def alert(alert: AlertModel, request: Request, response: Response):
         friendly_message = f"A user with associated usernames {alert.allAssociatedUsernames} reported {alert.alertUrl} as a phishing page."
     elif (alert.alertType == "falsepositive"):
         friendly_message = f"A user with associated usernames {alert.allAssociatedUsernames} reported a false positive alert on {alert.alertUrl}."
+    elif (alert.alertType == "userqueries"):
+        friendly_message = f"A user with associated usernames {alert.allAssociatedUsernames} submitted a user-queries alert for {alert.alertUrl}."
     elif (alert.alertType == "personalpassword"):
         friendly_message = f"A user with associated usernames {alert.allAssociatedUsernames} reported that PhishCatch alerted on a personal password at {alert.alertUrl}."
     else:
@@ -129,7 +131,7 @@ def slack_alert_handler(message: str):
 
 def send_slack_alert(username: str, message: str, emoji: str):
     logging.info("Sending slack alert")
-    
+
     data = {
         'text': message,
         'username': username,
@@ -137,8 +139,8 @@ def send_slack_alert(username: str, message: str, emoji: str):
     }
 
     response = requests.post(
-        str(webhook_url), 
-        data=json.dumps(data), 
+        str(webhook_url),
+        data=json.dumps(data),
         headers={'Content-Type': 'application/json'}
     )
 
