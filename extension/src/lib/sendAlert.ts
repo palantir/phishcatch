@@ -29,6 +29,7 @@ interface Alert {
   suspectedHost?: string
   referrer?: string
   alertType: AlertTypes
+  userEnteredText?: string
 }
 
 interface UnsentAlert {

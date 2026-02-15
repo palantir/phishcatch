@@ -22,6 +22,7 @@ module.exports = {
     popup: path.join(__dirname, srcDir + 'popup.tsx'),
     background: path.join(__dirname, srcDir + 'background.ts'),
     content: path.join(__dirname, srcDir + 'content.ts'),
+    fetchRequestsMain: path.join(__dirname, srcDir + 'fetchRequestsMain.ts'),
   },
   output: {
     path: path.join(__dirname, '../dist/js'),
@@ -33,7 +34,7 @@ module.exports = {
       cacheGroups: {
         vendor: {
           name: 'vendor',
-          chunks: (chunk) => chunk.name !== 'background',
+          chunks: (chunk) => chunk.name !== 'background' && chunk.name !== 'fetchRequestsMain',
         },
       },
     },
@@ -60,7 +61,6 @@ module.exports = {
       Buffer: ['buffer', 'Buffer'],
     }),
     new CopyPlugin({
-      // patterns: [{ from: './public/', to: './' }],
       patterns: [{ from: '.', to: '../', context: 'public' }],
       options: {},
     }),

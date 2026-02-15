@@ -24,7 +24,7 @@ const RFC1918 = new RegExp(`(^127\.)|(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(
 const localhostRegexp = new RegExp(`^localhost(:\\d*)?$`)
 const starRegexp = new RegExp(`^\\*\\..*`)
 
-function isLocal(host: string) {
+export function isLocal(host: string) {
   if (ipRegexp.test(host)) {
     return RFC1918.test(host)
   } else {
@@ -32,7 +32,7 @@ function isLocal(host: string) {
   }
 }
 
-function hostMatches(host: string, domainList: string[]) {
+export function hostMatches(host: string, domainList: string[]) {
   return domainList.some((domain) => {
     if (domain === host) {
       return true

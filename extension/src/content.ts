@@ -19,6 +19,7 @@ import { DomainType, PasswordContent, UsernameContent } from './types'
 import { getConfig } from './config'
 import { logInformationMessage } from './lib/logToConsole'
 import { isBannedUrl, setBannedMessage } from './content-lib/bannedMessage'
+import { startFetchMonitoring } from './fetchRequestsIsolate'
 
 // wait for page to load before doing anything
 function ready(callbackFunc: () => void) {
@@ -161,6 +162,9 @@ ready(() => {
       document.addEventListener('focusout', enterpriseFocusOutTrigger)
       document.addEventListener('keydown', entepriseFormSubmissionTrigger, true)
       void checkDomHash()
+      if (window.top === window.self) {
+        void startFetchMonitoring()
+      }
     } else if ((await getDomainType(window.location.hostname)) === DomainType.DANGEROUS) {
       document.addEventListener('input', inputChangedTrigger, false)
       void checkDomHash()

@@ -35,6 +35,53 @@ export interface Prefs {
   username_selectors: string[]
   username_regexes: string[]
   banned_urls: string[]
+  capture_enterprise_domains: Record<string, CaptureDomainData>
+}
+
+/**
+ * Information required to log Fetch request
+ */
+export interface CaptureDomainData {
+  /**
+   * The URL of the Fetch Request to log
+   * Note: This can be a partial URL
+   **/
+  requestURL: string
+  /**
+   * A string representation of the request object path to traverse to the attribute to capture
+   * Use a '.' to delinate between objects properties
+   */
+  requestObjectPath?: string
+}
+
+/**
+ * Information required to log Fetch request
+ */
+export interface CaptureConfiguration {
+  /**
+   * A unique, random character string used to identify messages passed between the content script
+   * and the script injected into the MAIN world
+   **/
+  randomEventMessageUUID: string
+  /**
+   * The site specific information need to capture a part of a Fetch Request
+   */
+  captureInformation: CaptureDomainData
+}
+
+/**
+ * Message sent from Main world script to content script when specific text to log is found on the request
+ */
+export interface UserEnteredTextMessage {
+  /**
+   * A unique, random character string used to identify messages passed between the content script
+   * and the script injected into the MAIN world
+   **/
+  randomEventMessageUUID: string
+  /**
+   *
+   */
+  userEnteredText: string
 }
 
 export enum UrlSanitizationEnum {
@@ -44,8 +91,8 @@ export enum UrlSanitizationEnum {
 }
 
 export interface PageMessage {
-  msgtype: 'username' | 'password' | 'debug' | 'domstring'
-  content: PasswordContent | UsernameContent | DomstringContent | string
+  msgtype: 'username' | 'password' | 'debug' | 'domstring' | 'userenteredtext'
+  content: PasswordContent | UsernameContent | DomstringContent | UserEnteredTextContent | string
 }
 
 export interface PasswordContent {
@@ -63,6 +110,7 @@ export enum AlertTypes {
   USERREPORT = 'userreport',
   FALSEPOSITIVE = 'falsepositive',
   PERSONALPASSWORD = 'personalpassword',
+  USERQUERIES = 'userqueries',
 }
 
 export interface AlertContent {
@@ -83,6 +131,28 @@ export interface UsernameContent {
 export interface DomstringContent {
   dom: string
   url: string
+}
+
+/**
+ * Message sent from a content script when specific text to log is found on the request
+ */
+export interface UserEnteredTextContent {
+  /**
+   * the user entered text captured from a request sent from the browser
+   */
+  userEnteredText: string
+  /**
+   * the URL of the page the user was on when the text was captured
+   */
+  url: string
+  /**
+   * the referrer of the page the user was on when the text was captured
+   */
+  referrer: string
+  /**
+   * a timestamp when the text was captured
+   */
+  timestamp: number
 }
 
 export type DebugContent = string

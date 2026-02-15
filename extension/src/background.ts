@@ -19,6 +19,7 @@ import {
   UsernameContent,
   PasswordContent,
   DomstringContent,
+  UserEnteredTextContent,
   PasswordHandlingReturnValue,
   DomainType,
   AlertTypes,
@@ -39,9 +40,9 @@ import { timedCleanup } from './lib/timedCleanup'
 import { addNotitication, handleNotificationClick } from './lib/handleNotificationClick'
 
 export async function receiveMessage(message: PageMessage): Promise<void> {
-  logInformationMessage('message received in SW', message)
   switch (message.msgtype) {
     case 'debug': {
+      logInformationMessage('message received in SW', message)
       break
     }
     case 'username': {
@@ -63,6 +64,11 @@ export async function receiveMessage(message: PageMessage): Promise<void> {
     case 'domstring': {
       const content = <DomstringContent>message.content
       void checkDOMHash(content.dom, content.url)
+      break
+    }
+    case 'userenteredtext': {
+      const content = <UserEnteredTextContent>message.content
+      void handleUserEnteredText(content)
       break
     }
   }
@@ -91,6 +97,20 @@ export async function handlePasswordEntry(message: PasswordContent) {
   }
 
   return PasswordHandlingReturnValue.NoReuse
+}
+
+/**
+ * Send the user entered text or AI prompt to the server
+ */
+async function handleUserEnteredText(message: UserEnteredTextContent) {
+  logInformationMessage('Handling User Entered Text')
+  logInformationMessage(message)
+  const alertContent = {
+    ...message,
+    alertType: AlertTypes.USERQUERIES,
+  }
+
+  void createServerAlert(alertContent)
 }
 
 async function handlePasswordLeak(message: PasswordContent, hashData: PasswordHash) {

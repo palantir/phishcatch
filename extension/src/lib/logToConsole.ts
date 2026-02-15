@@ -18,7 +18,7 @@ export async function logInformationMessage(...args: any[]) {
   if (!config.enable_debug_logging) {
     return
   }
-  console.log(args)
+  console.log(...args)
 }
 
 export async function logErrorMessage(...args: any[]) {
@@ -26,5 +26,5 @@ export async function logErrorMessage(...args: any[]) {
   if (!config.enable_debug_logging) {
     return
   }
-  console.error(args)
+  console.error(...args)
 }

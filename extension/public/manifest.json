@@ -28,7 +28,14 @@
       "js": ["js/content.js", "js/vendor.js"]
     }
   ],
-  "minimum_chrome_version": "124.0",
+  "minimum_chrome_version": "144.0",
   "permissions": ["alarms", "storage", "unlimitedStorage", "notifications"],
-  "host_permissions": ["http://*/*", "https://*/*"]
+  "host_permissions": ["http://*/*", "https://*/*"],
+  "web_accessible_resources": [
+    {
+      "resources": ["js/fetchRequestsMain.js"],
+      "matches": ["*://*/*"],
+      "use_dynamic_url": true
+    }
+  ]
 }

@@ -41,6 +41,7 @@ const defaults: Prefs = {
   username_regexes: [],
   username_selectors: [],
   banned_urls: [],
+  capture_enterprise_domains: {},
 }
 
 let configCache: configCache | false = false
