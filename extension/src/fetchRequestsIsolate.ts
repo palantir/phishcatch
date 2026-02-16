@@ -91,7 +91,8 @@ const injectScriptIntoTabJS = function ({ src, name = '', params = {} }: InjectS
 const runOnPage = async function (): Promise<void> {
   const host = getHostFromUrl(await getSanitizedUrl(location.href))
   const config = await getConfig()
-  const captureInformation = config?.capture_enterprise_domains[host]
+  const captureDomainsMap = config?.capture_enterprise_domains ?? {}
+  const captureInformation = captureDomainsMap[host]
 
   injectScriptIntoTabJS({
     src: 'js/fetchRequestsMain.js',
@@ -103,7 +104,10 @@ const runOnPage = async function (): Promise<void> {
   })
 
   // process the event messages from the script injected into the Main world
-  window.addEventListener('message', messageHandler)
+  window.addEventListener('message', messageHandler, { passive: true })
+  window.addEventListener('unload', () => {
+    window.removeEventListener('message', messageHandler)
+  })
 }
 
 /**
@@ -114,7 +118,8 @@ const runOnPage = async function (): Promise<void> {
 async function shouldCaptureFetchInformation(): Promise<boolean> {
   const host = getHostFromUrl(await getSanitizedUrl(location.href))
   const config = await getConfig()
-  const captureDomains = Object.keys(config?.capture_enterprise_domains)
+  const captureDomainsMap = config?.capture_enterprise_domains ?? {}
+  const captureDomains = Object.keys(captureDomainsMap)
   if (captureDomains.length > 0) {
     return hostMatches(host, captureDomains)
   }
