@@ -62,9 +62,16 @@ async function isEnterpriseDomain(host: string): Promise<boolean> {
   return hostMatches(host, config.enterprise_domains)
 }
 
+async function isAiDomain(host: string): Promise<boolean> {
+  const config = await getConfig()
+  return hostMatches(host, config.ai_domains)
+}
+
 export async function getDomainType(host: string) {
   if (await isEnterpriseDomain(host)) {
     return DomainType.ENTERPRISE
+  } else if (await isAiDomain(host)) {
+    return DomainType.AI
   } else if (await isIgnoredDomain(host)) {
     return DomainType.IGNORED
   } else {

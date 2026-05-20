@@ -27,6 +27,7 @@ const defaults: Prefs = {
   display_reuse_alerts: true,
   enable_debug_gui: true,
   enterprise_domains: [],
+  ai_domains: [],
   expire_hash_on_use: true,
   faq_link: null,
   hash_truncation_amount: 0,

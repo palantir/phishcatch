@@ -17,6 +17,7 @@ export interface Prefs {
   display_reuse_alerts: boolean
   enable_debug_gui: boolean
   enterprise_domains: string[]
+  ai_domains: string[]
   expire_hash_on_use: boolean
   faq_link: string | null
   hash_truncation_amount: number
@@ -130,6 +131,7 @@ export enum PasswordHandlingReturnValue {
 
 export enum DomainType {
   ENTERPRISE = 'ENTERPRISE',
+  AI = 'AI',
   IGNORED = 'IGNORED',
   DANGEROUS = 'DANGEROUS',
 }

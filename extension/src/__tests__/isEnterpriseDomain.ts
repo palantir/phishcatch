@@ -21,6 +21,10 @@ const enterpriseDomain = 'corporate.com'
 const wildcardEnterpriseDomain = '*.enterprise.com'
 const wildcardEnterpriseSubDomain = '*.sub.bigcorp.com'
 
+const aiDomain = 'ai.com'
+const wildcardAiDomain = '*.aiplus.com'
+const wildcardAiSubDomain = '*.sub.aitothemax.com'
+
 const enterpriseUrlWithoutTLD = 'https://foo-bar-baz'
 
 const ignoredDomain = 'ignored.com'
@@ -32,6 +36,7 @@ const evilSubDomain = 'foo.evil.com'
 beforeAll(async () => {
   await setConfigOverride({
     enterprise_domains: [enterpriseDomain, wildcardEnterpriseDomain, wildcardEnterpriseSubDomain],
+    ai_domains: [aiDomain, wildcardAiDomain, wildcardAiSubDomain],
     phishcatch_server: '',
     psk: '',
     data_expiry: 90,
@@ -45,13 +50,16 @@ afterAll((done) => {
 })
 
 describe('We should be able to identify enterprise and ignored domains', () => {
-  it('Enterprise domains should be recognized as such', async () => {
+  it('Enterprise and AI domains should be recognized as such', async () => {
     expect(await getDomainType(enterpriseDomain)).toBe(DomainType.ENTERPRISE)
+    expect(await getDomainType(aiDomain)).toBe(DomainType.AI)
   })
 
-  it('Enterprise subdomains should be recognized, given a wildcard', async () => {
+  it('Enterprise and AI subdomains should be recognized, given a wildcard', async () => {
     expect(await getDomainType('foo.enterprise.com')).toBe(DomainType.ENTERPRISE)
     expect(await getDomainType('test.foo.enterprise.com')).toBe(DomainType.ENTERPRISE)
+    expect(await getDomainType('magic.aiplus.com')).toBe(DomainType.AI)
+    expect(await getDomainType('moremagic.sub.aiplus.com')).toBe(DomainType.AI)
   })
 
   it('Wildcards should behave correctly', async () => {
@@ -62,6 +70,7 @@ describe('We should be able to identify enterprise and ignored domains', () => {
     expect(await getDomainType('somethingsubbigcorp.com')).toBe(DomainType.DANGEROUS)
     expect(await getDomainType('bigcorp.com')).toBe(DomainType.DANGEROUS)
     expect(await getDomainType('foo.bigcorp.com')).toBe(DomainType.DANGEROUS)
+    expect(await getDomainType('magic.ai.com')).toBe(DomainType.DANGEROUS)
 
     expect(await getDomainType('evilenterprise.com')).toBe(DomainType.DANGEROUS)
     expect(await getDomainType('sub.evilenterprise.com')).toBe(DomainType.DANGEROUS)
