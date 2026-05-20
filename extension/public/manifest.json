@@ -1,5 +1,5 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "PhishCatch",
   "description": "Identify and prevent enterprise password leaks",
   "version": "0.16",
@@ -10,20 +10,24 @@
     "managed_schema": "schema.json"
   },
   "externally_connectable": {},
-  "content_security_policy": "script-src 'self'; object-src 'self'; connect-src http://localhost:* https://*",
-  "background": {
-    "scripts": [
-      "js/background.js",
-      "js/vendor.js"
-    ],
-    "persistent": true
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'",
+    "sandbox": "sandbox allow-scripts allow-forms allow-popups allow-modals; script-src 'self' 'unsafe-inline'; object-src 'self'"
   },
-  "browser_action": {
+  "background": {
+    "service_worker": "js/background.js"
+  },
+  "action": {
     "default_icon": "icon.png",
     "default_popup": "popup.html",
     "default_title": "PhishCatch"
   },
-  "web_accessible_resources": [],
+  "web_accessible_resources": [
+    {
+      "resources": [],
+      "matches": ["*://*/*"]
+    }
+  ],
   "content_scripts": [
     {
       "matches": [
@@ -37,9 +41,11 @@
       ]
     }
   ],
-  "permissions": [
+  "host_permissions": [
     "http://*/*",
-    "https://*/*",
+    "https://*/*"
+  ],
+  "permissions": [
     "storage",
     "notifications"
   ]
