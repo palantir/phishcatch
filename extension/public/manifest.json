@@ -36,8 +36,7 @@
       "all_frames": true,
       "run_at": "document_idle",
       "js": [
-        "js/content.js",
-        "js/vendor.js"
+        "js/content.js"
       ]
     }
   ],
