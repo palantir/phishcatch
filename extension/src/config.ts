@@ -28,6 +28,7 @@ const defaults: Prefs = {
   enable_debug_gui: true,
   enterprise_domains: [],
   ai_domains: [],
+  ai_input_selectors: [],
   expire_hash_on_use: true,
   faq_link: null,
   hash_truncation_amount: 0,

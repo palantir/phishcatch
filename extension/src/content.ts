@@ -132,6 +132,23 @@ function inputChangedTrigger(event: Event) {
   }
 }
 
+async function aIinputChangedTrigger(event: Event) {
+  const config = await getConfig()
+  const target = event.target as HTMLInputElement
+
+  // selectors to add to config:
+  // chatgpt uses div#prompt-textarea[contenteditable]
+  // also has a hidden textarea[name=prompt-textarea] fallback
+
+  if (target.matches(config.ai_input_selectors.join(', '))) {
+    // just getting text for now but could expand to check for images/files
+    const inputText = target.value || target.textContent;
+    // TODO: debounce and send
+    console.log('ai input detected:', inputText);
+    // debouncedSendAiInput(inputText)
+  }
+}
+
 async function checkDomHash() {
   chrome.runtime.sendMessage({
     msgtype: 'domstring',
@@ -151,11 +168,16 @@ async function checkIfUrlBanned() {
 ready(() => {
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   setTimeout(async () => {
-    if ((await getDomainType(window.location.hostname)) === DomainType.ENTERPRISE) {
+    const domainType = await getDomainType(window.location.hostname);
+    if (domainType === DomainType.ENTERPRISE) {
       document.addEventListener('focusout', enterpriseFocusOutTrigger)
       document.addEventListener('keydown', entepriseFormSubmissionTrigger, true)
       void checkDomHash()
-    } else if ((await getDomainType(window.location.hostname)) === DomainType.DANGEROUS) {
+    } else if (domainType === DomainType.AI) {
+      document.addEventListener('input', aIinputChangedTrigger, false)
+      // TODO: add ai_form_selectors to config, listen for submit?
+      // or just use .closest('form')
+    } else if (domainType === DomainType.DANGEROUS) {
       document.addEventListener('input', inputChangedTrigger, false)
       void checkDomHash()
     }

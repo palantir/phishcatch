@@ -18,6 +18,7 @@ export interface Prefs {
   enable_debug_gui: boolean
   enterprise_domains: string[]
   ai_domains: string[]
+  ai_input_selectors: string[]
   expire_hash_on_use: boolean
   faq_link: string | null
   hash_truncation_amount: number
