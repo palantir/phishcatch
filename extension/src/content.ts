@@ -163,6 +163,33 @@ async function aIinputChangedTrigger(event: Event) {
   }
 }
 
+function isSensitiveData(data: string) {
+  // dummy function - could also make this async and reach out to an api
+  return data.includes('password') || data.includes('secret');
+}
+
+// experimental paste handling: fires before input/change event, can block with preventDefault
+async function aIinputPasteTrigger(event: ClipboardEvent) {
+  // note: preventDefault will not work after an await, so we have to do it here in order to block pasting
+  event.preventDefault();
+  const config = await getConfig()
+  const selectorString = config.ai_input_selectors.join(', ');
+  const target = event.target as HTMLInputElement
+
+  if (target.matches(selectorString) || target.closest(selectorString)) {
+    // just handling text for now, but could expand to handle images/files
+    const pastedText = event.clipboardData?.getData('text');
+
+    if (pastedText && isSensitiveData(pastedText)) {
+      alert('Pasting sensitive data blocked');
+    } else {
+      // if not sensitive data, we need to manually recreate the paste event since we prevented default at the beginning
+      // this is deprecated but still supported - preserves undo/redo and cursor selection
+      document.execCommand('insertHTML', false, pastedText);
+    }
+  }
+}
+
 async function checkDomHash() {
   chrome.runtime.sendMessage({
     msgtype: 'domstring',
@@ -188,6 +215,8 @@ ready(() => {
       document.addEventListener('keydown', entepriseFormSubmissionTrigger, true)
       void checkDomHash()
     } else if (domainType === DomainType.AI) {
+      // paste listener uses capture mode to ensure it runs first so we can cancel it
+      document.addEventListener('paste', aIinputPasteTrigger, true)
       document.addEventListener('input', aIinputChangedTrigger, false)
       // TODO: add ai_form_selectors to config, listen for submit?
       // or just use .closest('form')
