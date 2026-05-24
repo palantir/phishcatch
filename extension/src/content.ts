@@ -132,6 +132,22 @@ function inputChangedTrigger(event: Event) {
   }
 }
 
+async function sendAiInput(inputText: string) {
+  console.log('ai input detected:', inputText);
+  const content = {
+    inputText,
+    url: await getSanitizedUrl(location.href),
+    referrer: await getSanitizedUrl(document.referrer),
+    timestamp: new Date().getTime(),
+  };
+  chrome.runtime.sendMessage({
+    msgtype: 'ai',
+    content,
+  })
+}
+
+const debouncedSendAiInput = debounce(sendAiInput, 100)
+
 async function aIinputChangedTrigger(event: Event) {
   const config = await getConfig()
   const target = event.target as HTMLInputElement
@@ -143,9 +159,7 @@ async function aIinputChangedTrigger(event: Event) {
   if (target.matches(config.ai_input_selectors.join(', '))) {
     // just getting text for now but could expand to check for images/files
     const inputText = target.value || target.textContent;
-    // TODO: debounce and send
-    console.log('ai input detected:', inputText);
-    // debouncedSendAiInput(inputText)
+    debouncedSendAiInput(inputText)
   }
 }
 

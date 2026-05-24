@@ -18,6 +18,7 @@ import {
   UsernameContent,
   PasswordContent,
   DomstringContent,
+  AiContent,
   PasswordHandlingReturnValue,
   DomainType,
   AlertTypes,
@@ -58,7 +59,21 @@ export async function receiveMessage(message: PageMessage): Promise<void> {
       void checkDOMHash(content.dom, content.url)
       break
     }
+    case 'ai': {
+      const content = <AiContent>message.content
+      void handleAiContent(content)
+      break
+    }
   }
+}
+
+function handleAiContent(message: AiContent) {
+    const alertContent = {
+    ...message,
+    alertType: AlertTypes.AI,
+  }
+
+  void createServerAlert(alertContent)
 }
 
 //check if the site the password was entered into is a corporate site

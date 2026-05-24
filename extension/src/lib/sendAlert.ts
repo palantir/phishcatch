@@ -26,6 +26,7 @@ interface Alert {
   suspectedUsername?: string
   suspectedHost?: string
   referrer?: string
+  inputText?: string
   alertType: AlertTypes
 }
 
@@ -113,6 +114,11 @@ export async function createServerAlert(message: AlertContent) {
     suspectedUsername: message.associatedUsername,
     suspectedHost: message.associatedHostname,
     clientId: await getId(),
+  }
+
+  // ai input text
+  if (message.inputText) {
+    data.inputText = message.inputText;
   }
 
   const usernames = (await getUsernames()).map((username) => username.username)

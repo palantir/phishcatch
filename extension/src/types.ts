@@ -41,8 +41,8 @@ export enum UrlSanitizationEnum {
 }
 
 export interface PageMessage {
-  msgtype: 'username' | 'password' | 'debug' | 'domstring'
-  content: PasswordContent | UsernameContent | DomstringContent | string
+  msgtype: 'username' | 'password' | 'debug' | 'domstring' | 'ai'
+  content: PasswordContent | UsernameContent | DomstringContent | AiContent | string
 }
 
 export interface PasswordContent {
@@ -54,12 +54,20 @@ export interface PasswordContent {
   username?: string
 }
 
+export interface AiContent {
+  inputText: string
+  url: string
+  referrer: string
+  timestamp: number
+}
+
 export enum AlertTypes {
   REUSE = 'reuse',
   DOMHASH = 'domhash',
   USERREPORT = 'userreport',
   FALSEPOSITIVE = 'falsepositive',
   PERSONALPASSWORD = 'personalpassword',
+  AI = 'ai',
 }
 
 export interface AlertContent {
@@ -69,6 +77,7 @@ export interface AlertContent {
   alertType: AlertTypes
   associatedUsername?: string
   associatedHostname?: string
+  inputText?: string
 }
 
 export interface UsernameContent {
